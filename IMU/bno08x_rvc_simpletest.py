@@ -5,7 +5,7 @@ import time
 import board
 import busio
 
-uart = busio.UART(board.GP16, board.GP17, baudrate=115200, receiver_buffer_size=2048)
+uart = busio.UART(board.GP4, board.GP5, baudrate=115200, receiver_buffer_size=2048)
 
 # uncomment and comment out the above for use with Raspberry Pi
 # import serial
