@@ -11,7 +11,7 @@
 from machine import I2C, Pin
 import time
 import math
-from bno08x_i2c import *
+from lib.bno08x_i2c import *
 
 I2C1_SDA = Pin(16)
 I2C1_SCL = Pin(17)
