@@ -10,19 +10,18 @@ freq = 10 # PWM frequency
 
 # Setup for front-left motor
 FLSpeed = PWM(Pin(0), freq=freq) # check led
-FLDir = Pin(1)
+FLDir = Pin(1, Pin.OUT)
 
 # setup for front-right motor
 FRSpeed = PWM(Pin(28), freq=freq) # check led
-FRDir = Pin(27)
-
+FRDir = Pin(27, Pin.OUT)
 # setup for back-left motor
 BLSpeed = PWM(Pin(14), freq=freq) # check led
-BLDir = Pin(15)
+BLDir = Pin(15, Pin.OUT)
 
 #setup for back-right motor
-BRSpeed = PWM(Pin(19), freq=freq) # check led
-BRDir = Pin(18)
+BRSpeed = PWM(Pin(22), freq=freq) # check led
+BRDir = Pin(2, Pin.OUT)
 
 
 def move_forward(speed):
@@ -38,10 +37,13 @@ def move_forward(speed):
     pwm = int((speed/100)*MAX_PWM)
     FLSpeed.duty_u16(pwm)
     FLDir.value(0)
+
     FRSpeed.duty_u16(pwm)
     FRDir.value(0)
+
     BLSpeed.duty_u16(pwm)
     BLDir.value(0)
+
     BRSpeed.duty_u16(pwm)
     BRDir.value(0)
 
@@ -78,13 +80,13 @@ def move_right(speed):
     """
     pwm = int((speed/100)*MAX_PWM)
     FLSpeed.duty_u16(pwm)
-    FLDir.value(1)
+    FLDir.value(0)
     FRSpeed.duty_u16(pwm)
-    FRDir.value(0)
+    FRDir.value(1)
     BLSpeed.duty_u16(pwm)
-    BLDir.value(0)
+    BLDir.value(1)
     BRSpeed.duty_u16(pwm)
-    BRDir.value(1)
+    BRDir.value(0)
 
 def move_left(speed):
     """
@@ -98,37 +100,17 @@ def move_left(speed):
     """
     pwm = int((speed/100)*MAX_PWM)
     FLSpeed.duty_u16(pwm)
-    FLDir.value(0)
-    FRSpeed.duty_u16(pwm)
-    FRDir.value(1)
-    BLSpeed.duty_u16(pwm)
-    BLDir.value(1)
-    BRSpeed.duty_u16(pwm)
-    BRDir.value(0)
-
-def move_45(speed):
-    """
-    Moves the robot at 45 degrees measured from +x-axis
-
-    Args: 
-    speed (int) from 0-100 
-
-    Returns: 
-    none
-    """
-    pwm = int((speed/100)*MAX_PWM)
-    FLSpeed.duty_u16(0)
     FLDir.value(1)
     FRSpeed.duty_u16(pwm)
     FRDir.value(0)
     BLSpeed.duty_u16(pwm)
     BLDir.value(0)
-    BRSpeed.duty_u16(0)
+    BRSpeed.duty_u16(pwm)
     BRDir.value(1)
 
-def move_135(speed):
+def move_45(speed):
     """
-    Moves the robot at 135 degrees measured from +x-axis
+    Moves the robot at 45 degrees measured from +x-axis
 
     Args: 
     speed (int) from 0-100 
@@ -144,6 +126,26 @@ def move_135(speed):
     BLSpeed.duty_u16(0)
     BLDir.value(0)
     BRSpeed.duty_u16(pwm)
+    BRDir.value(0)
+
+def move_135(speed):
+    """
+    Moves the robot at 135 degrees measured from +x-axis
+
+    Args: 
+    speed (int) from 0-100 
+
+    Returns: 
+    none
+    """
+    pwm = int((speed/100)*MAX_PWM)
+    FLSpeed.duty_u16(0)
+    FLDir.value(0)
+    FRSpeed.duty_u16(pwm)
+    FRDir.value(0)
+    BLSpeed.duty_u16(pwm)
+    BLDir.value(0)
+    BRSpeed.duty_u16(0)
     BRDir.value(0)
 
 def move_315(speed):  
@@ -157,14 +159,14 @@ def move_315(speed):
     none
     """
     pwm = int((speed/100)*MAX_PWM)
-    FLSpeed.duty_u16(pwm)
-    FLDir.value(1)
-    FRSpeed.duty_u16(0)
-    FRDir.value(0)
-    BLSpeed.duty_u16(0)
-    BLDir.value(0)
-    BRSpeed.duty_u16(pwm)
-    BRDir.value(1)
+    FLSpeed.duty_u16(0)
+    FLDir.value(0)
+    FRSpeed.duty_u16(pwm)
+    FRDir.value(1)
+    BLSpeed.duty_u16(pwm)
+    BLDir.value(1)
+    BRSpeed.duty_u16(0)
+    BRDir.value(0)
 
 def move_225(speed):  
     """
@@ -177,18 +179,18 @@ def move_225(speed):
     none
     """
     pwm = int((speed/100)*MAX_PWM)
-    FLSpeed.duty_u16(0)
+    FLSpeed.duty_u16(pwm)
     FLDir.value(1)
-    FRSpeed.duty_u16(pwm)
-    FRDir.value(1)
-    BLSpeed.duty_u16(pwm)
-    BLDir.value(1)
-    BRSpeed.duty_u16(0)
+    FRSpeed.duty_u16(0)
+    FRDir.value(0)
+    BLSpeed.duty_u16(0)
+    BLDir.value(0)
+    BRSpeed.duty_u16(pwm)
     BRDir.value(1)
 
 def stop_motors():
     """
-    Shuts off all PWM signals. Should come to a coast stop (probably not desired)
+    Shuts off all PWM signals. 
     Args: 
     speed (int) from 0-100 
 
@@ -201,5 +203,27 @@ def stop_motors():
     BRSpeed.duty_u16(0)
 
 
-move_forward(50)
+# Test all
+move_forward(100)
+time.sleep(5)
+move_backward(100)
+time.sleep(5)
+move_left(100)
+time.sleep(5)
+move_right(100)
+time.sleep(5)
+move_45(100)
+time.sleep(5)
+move_315(100)
+time.sleep(5)
+move_135(100)
+time.sleep(5)
+move_225(100)
+time.sleep(5)
+stop_motors()
+    
+# move_225(75)
+# time.sleep(10)
+# stop_motors()
+
 
