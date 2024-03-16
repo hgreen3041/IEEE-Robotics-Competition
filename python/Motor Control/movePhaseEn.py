@@ -191,8 +191,9 @@ def move_225(speed):
 def stop_motors():
     """
     Shuts off all PWM signals. 
+    
     Args: 
-    speed (int) from 0-100 
+    None
 
     Returns: 
     none
