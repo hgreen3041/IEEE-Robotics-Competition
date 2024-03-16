@@ -1,6 +1,6 @@
 from machine import I2C, Pin
 
-scanner = I2C(0, scl=Pin(17), sda=Pin(16), freq=400000)
+scanner = I2C(0, scl=Pin(5), sda=Pin(4), freq=400000)
 
 
 
