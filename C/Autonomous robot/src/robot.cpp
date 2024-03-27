@@ -15,10 +15,13 @@ const int sensorCount = 4;
 
 
 // The Arduino pin connected to the XSHUT pin of each sensor.
-const uint8_t xshutPins[sensorCount] = { 10,11,12,13};
+const uint8_t xshutPins[sensorCount] = {6,22,17,16};
 
 // Create sensors object
 VL53L1X sensors[sensorCount];
+
+
+
 
 
 // Here is where you define the sensor outputs you want to receive
@@ -118,19 +121,43 @@ case SH2_GAME_ROTATION_VECTOR:
 }
 
 
-Serial.print("Sensor 1: ");
-Serial.print(sensors[0].read());
-Serial.print("\t");
-Serial.print("Sensor 2: ");
-Serial.print(sensors[1].read());
-Serial.print("\t");
-Serial.print("Sensor 3: ");
-Serial.print(sensors[2].read());
-Serial.print("\t");
-Serial.print("Sensor 4: ");
-Serial.print(sensors[3].read());
-Serial.println();
+// Serial.print("Sensor 1: ");
+// Serial.print(sensors[0].read());
+// Serial.print("\t");
+// Serial.print("Sensor 2: ");
+// Serial.print(sensors[1].read());
+// Serial.print("\t");
+// Serial.print("Sensor 3: ");
+// Serial.print(sensors[2].read());
+// Serial.print("\t");
+// Serial.print("Sensor 4: ");
+// Serial.print(sensors[3].read());
 
+double halfRobotWidthx = 72.0;
+double halfRobotWidthy = 135.0;
+
+double sensor1 = static_cast<double>(sensors[0].read());
+// Serial.print(sensor1);
+// Serial.print("\t");
+double sensor2 = static_cast<double>(sensors[1].read());
+// Serial.print(sensor2);
+// Serial.print("\t");
+double sensor3 = static_cast<double>(sensors[2].read());
+// Serial.print(sensor3);
+// Serial.print("\t");
+double sensor4 = static_cast<double>(sensors[3].read());
+// Serial.println(sensor4);
+
+
+double x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(2438 - halfRobotWidthx - sensor3);
+double y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(2438 - halfRobotWidthy - sensor2);
+
+Serial.print("X-coordinate ");
+Serial.print(x/25.4);
+Serial.print("\t");
+Serial.print("Y-coordinate ");
+Serial.print(y/25.4);
+Serial.print("\t");
 
 
 

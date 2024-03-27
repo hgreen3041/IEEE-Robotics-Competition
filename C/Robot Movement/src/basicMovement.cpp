@@ -9,22 +9,27 @@ Forward, backward, right, left, 45, 135, 225, 315
 const int MAX_PWM = 255;
 
 // Pins for front-left motor
-const int FL = 2;
-const int FLDir = 21;
+const int FL = 15;
+const int FLDir = 13;
 
 // Pins for front-right motor
-const int FR = 3;
-const int FRDir = 20; 
+const int FR = 14;
+const int FRDir = 12; 
 
 // Pins for back-left motor
-const int BL = 14;
-const int BLDir = 12;
+const int BL = 18;
+const int BLDir = 20;
 
 // Pins for back-right motor
-const int BR = 15;
-const int BRDir = 13;
+const int BR = 19;
+const int BRDir = 21;
+
+// LED
+
+const int led = 25; 
 
 void setup(){
+    pinMode(led, OUTPUT);
 
     pinMode(FL, OUTPUT);
     pinMode(FLDir, OUTPUT);
@@ -249,9 +254,11 @@ void stopMotors(){
 
 void loop(){
     
+    digitalWrite(led, HIGH);
+
     // Test all movement at full speed
     moveForward(255);
-    // delay(5000);
+    delay(5000);
     // moveBackward(255);
     // delay(5000);
     // moveLeft(255);
@@ -266,6 +273,7 @@ void loop(){
     // delay(5000);
     // move315(255);
     // delay(5000);
-    // stopMotors();
+    stopMotors();
+    delay(2000);
 
 }
