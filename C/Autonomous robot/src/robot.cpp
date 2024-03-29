@@ -1,7 +1,10 @@
 #include <VL53L1X.h>
 #include <Adafruit_BNO08x.h>
 #include <iostream>
+#include <Arduino.h>
 
+// initialize LED
+const int led = 25;
 
 // BNO08X IMU
 #define BNO08X_RESET -1
@@ -49,6 +52,10 @@ VL53L1X sensors[sensorCount];
 
 
 void setup(){
+
+  pinMode(led, OUTPUT);
+  digitalWrite(led, HIGH);
+
     Serial.begin(115200);
     while (!Serial) delay(10);
 
@@ -201,31 +208,31 @@ const Coordinates coilG = {0.0, 64.0};
 const Coordinates coilH = {0.0, 32.0};
 
 // Create states (last known coil)
-enum State { A, D, H, F, B, G, E, C }; 
+enum State { stateA, stateD, stateH, stateF, stateB, stateG, stateE, stateC }; 
 
 // Returns the next state given the current state of the robot.
 State getNextState(State currentState){
   switch(currentState){
-    case A:
-      return D;
-    case D: 
-      return H;
-    case H:
-      return F;
-    case F: 
-      return B;
-    case B: 
-      return G;
-    case G:
-      return E;
-    case E:
-      return C;
-    case C:
-      return A;
+    case stateA:
+      return stateD;
+    case stateD: 
+      return stateH;
+    case stateH:
+      return stateF;
+    case stateF: 
+      return stateB;
+    case stateB: 
+      return stateG;
+    case stateG:
+      return stateE;
+    case stateE:
+      return stateC;
+    case stateC:
+      return stateA;
   }
 }
 
-State currentLocation = H; // initial the starting location of the robot
+State currentState = stateH; // initialize the starting location of the robot
 
 
 void loop(){
@@ -236,6 +243,7 @@ Coordinates currLocation = getCoordinates();
 
 Serial.print("Yaw: ");
 Serial.print(yaw);
+Serial.print("\t");
 Serial.print("X-coordinate: ");
 Serial.print(currLocation.x);
 Serial.print("\t");
@@ -246,25 +254,65 @@ Serial.println("\t");
 // TODO: Need to implement functions for getting new sensor data if going to use switch statement
 
 
-// switch (currentLocation){
-//   case A:
-//     // Do something
+switch (currentState){
+  case stateA:
+    while(coilD.y - getCoordinates().y > 0){
+      // drive forward
+    }
 
-//   case B: 
-//     // Do something
-//   case C: 
-//     // Do something
-//   case D: 
-//     // Do something
-//   case E: 
-//     // Do something
-//   case F: 
-//     // Do something
-//   case G:
-//     // Do something
-//   case H: 
-//     // Do something
-// }
+    while(coilD.x - getCoordinates().x > 0){
+      // drive right
+    }
+  case stateB: 
+    while(coilD.y - getCoordinates().y > 0){
+      // drive forward
+    }
+    while(getCoordinates().x - coilG.x){
+      // drive left
+    }
+  case stateC: 
+    while(getCoordinates().x - coilA.x > 0){
+      // drive left
+    }
+    while(getCoordinates().y - coilA.y > 0){
+      // drive backward
+    }
+  case stateD: 
+    while(getCoordinates().x - coilH.x > 0){
+      // drive left
+    }
+    while(getCoordinates().y - coilH.y > 0){
+      //drive backward
+    }
+  case stateE: 
+    while(getCoordinates().y - coilC.y > 0){
+      // drive backward
+    }
+    while(coilA.x - getCoordinates().x > 0){
+      // drive right
+    }
+  case stateF:
+    while(getCoordinates().y - coilB.y > 0){
+      // drive backward
+    } 
+    while(coilB.x - getCoordinates().x > 0){
+      // drive right
+    }
+  case stateG:
+    while(coilE.x - getCoordinates().x > 0){
+      // drive right
+    }
+    while(coilE.y - getCoordinates().y > 0){
+      // drive forward
+    }
+  case stateH: 
+    while(coilF.x - getCoordinates().x > 0){
+      // drive right
+    }
+    while(coilF.y - getCoordinates().y > 0){
+      // drive forward
+    }
+}
 
 
 
