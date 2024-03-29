@@ -258,6 +258,7 @@ void loop(){
 
     // Test all movement at full speed
     moveForward(255);
+    // move135(255);
     delay(5000);
     // moveBackward(255);
     // delay(5000);
@@ -273,7 +274,7 @@ void loop(){
     // delay(5000);
     // move315(255);
     // delay(5000);
-    stopMotors();
+    // stopMotors();
     delay(2000);
 
 }

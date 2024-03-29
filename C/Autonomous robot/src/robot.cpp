@@ -1,14 +1,36 @@
 #include <VL53L1X.h>
 #include <Adafruit_BNO08x.h>
+#include <iostream>
 
 
-
-//BNO08X
-#define BNO08X_CS 10
-#define BNO08X_INT 9
+// BNO08X IMU
 #define BNO08X_RESET -1
+
+struct euler_t {
+  float yaw;
+  float pitch;
+  float roll;
+} ypr;
+
 Adafruit_BNO08x  bno08x(BNO08X_RESET);
 sh2_SensorValue_t sensorValue;
+
+#ifdef FAST_MODE
+  // Top frequency is reported to be 1000Hz (but freq is somewhat variable)
+  sh2_SensorId_t reportType = SH2_GYRO_INTEGRATED_RV;
+  long reportIntervalUs = 2000;
+#else
+  // Top frequency is about 250Hz but this report is more accurate
+  sh2_SensorId_t reportType = SH2_ARVR_STABILIZED_RV;
+  long reportIntervalUs = 5000;
+#endif
+void setReports(sh2_SensorId_t reportType, long report_interval) {
+  Serial.println("Setting desired reports");
+  if (! bno08x.enableReport(reportType, report_interval)) {
+    Serial.println("Could not enable stabilized remote vector");
+  }
+}
+
 
 //VL53L1X Sensors
 const int sensorCount = 4;
@@ -24,20 +46,13 @@ VL53L1X sensors[sensorCount];
 
 
 
-// Here is where you define the sensor outputs you want to receive
-void setReports(void) {
-  Serial.println("Setting desired reports");
-  if (! bno08x.enableReport(SH2_GAME_ROTATION_VECTOR)) {
-    Serial.println("Could not enable game vector");
-  }
-}
 
 
 void setup(){
     Serial.begin(115200);
     while (!Serial) delay(10);
-// bno08x----------------------------------------------------------
 
+  // BNO08X IMU------------------------------------------------------
   // Try to initialize!
   if (!bno08x.begin_I2C()) {
   //if (!bno08x.begin_UART(&Serial1)) {  // Requires a device with > 300 byte UART buffer!
@@ -45,12 +60,13 @@ void setup(){
     Serial.println("Failed to find BNO08x chip");
     while (1) { delay(10); }
   }
-  Serial.println("BNO08x Found!");
 
-  setReports();
+
+  setReports(reportType, reportIntervalUs);
+
   delay(100);
 
-
+  
   // VL53L1X---------------------------------------------------------
   Wire.begin();
   Wire.setClock(400000);
@@ -89,75 +105,168 @@ void setup(){
 }
 
 
+void quaternionToEuler(float qr, float qi, float qj, float qk, euler_t* ypr, bool degrees = false) {
 
+    float sqr = sq(qr);
+    float sqi = sq(qi);
+    float sqj = sq(qj);
+    float sqk = sq(qk);
+
+    ypr->yaw = atan2(2.0 * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr));
+    ypr->pitch = asin(-2.0 * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));
+    ypr->roll = atan2(2.0 * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));
+
+    if (degrees) {
+      ypr->yaw *= RAD_TO_DEG;
+      ypr->pitch *= RAD_TO_DEG;
+      ypr->roll *= RAD_TO_DEG;
+    }
+}
+
+void quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, euler_t* ypr, bool degrees = false) {
+    quaternionToEuler(rotational_vector->real, rotational_vector->i, rotational_vector->j, rotational_vector->k, ypr, degrees);
+}
+
+void quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, euler_t* ypr, bool degrees = false) {
+    quaternionToEuler(rotational_vector->real, rotational_vector->i, rotational_vector->j, rotational_vector->k, ypr, degrees);
+}
+
+struct Coordinates{
+  double x;
+  double y;
+};
+
+// Function to retrieve the current location of the robot
+Coordinates getCoordinates(){
+
+  Coordinates location;
+  // Set the half-width and half-length of the robot. 
+  double halfRobotWidthx = 72.0;
+  double halfRobotWidthy = 135.0;
+
+  // Read the sensors
+  double sensor1 = static_cast<double>(sensors[0].read());
+  double sensor2 = static_cast<double>(sensors[1].read());
+  double sensor3 = static_cast<double>(sensors[2].read());
+  double sensor4 = static_cast<double>(sensors[3].read());
+
+  // Calculate coordinates from sensor data
+  double x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(2438 - halfRobotWidthx - sensor3);
+  double y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(2438 - halfRobotWidthy - sensor2);
+
+  x = x/25.4; // Convert to inches
+  y = y/25.4; // convert to inches
+
+  location = {x, y};
+
+  return location; 
+}
+
+float getYaw(){
+    if (bno08x.wasReset()) {
+    Serial.print("sensor was reset ");
+    setReports(reportType, reportIntervalUs);
+  }
+  
+  if (bno08x.getSensorEvent(&sensorValue)) {
+    // in this demo only one report type will be received depending on FAST_MODE define (above)
+    switch (sensorValue.sensorId) {
+      case SH2_ARVR_STABILIZED_RV:
+        quaternionToEulerRV(&sensorValue.un.arvrStabilizedRV, &ypr, true);
+      case SH2_GYRO_INTEGRATED_RV:
+        // faster (more noise?)
+        quaternionToEulerGI(&sensorValue.un.gyroIntegratedRV, &ypr, true);
+        break;
+    }
+    
+    // Serial.print(ypr.yaw); 
+    // Serial.print("\t");              
+    // Serial.print(ypr.pitch);              
+    // Serial.print("\t");
+    // Serial.println(ypr.roll);
+  }
+
+  return ypr.yaw; 
+
+}
+
+// Coil locations in inches
+const Coordinates coilA = {32.0, 0.0};
+const Coordinates coilB = {64.0, 0.0};
+const Coordinates coilC = {96.0, 32.0};
+const Coordinates coilD = {96.0, 64.0};
+const Coordinates coilE = {64.0, 96.0};
+const Coordinates coilF = {32.0, 32.0};
+const Coordinates coilG = {0.0, 64.0};
+const Coordinates coilH = {0.0, 32.0};
+
+// Create states (last known coil)
+enum State { A, D, H, F, B, G, E, C }; 
+
+// Returns the next state given the current state of the robot.
+State getNextState(State currentState){
+  switch(currentState){
+    case A:
+      return D;
+    case D: 
+      return H;
+    case H:
+      return F;
+    case F: 
+      return B;
+    case B: 
+      return G;
+    case G:
+      return E;
+    case E:
+      return C;
+    case C:
+      return A;
+  }
+}
+
+State currentLocation = H; // initial the starting location of the robot
 
 
 void loop(){
 
-//BNO08X----------------------------------------
-if (bno08x.wasReset()) {
-    Serial.print("sensor was reset ");
-    setReports();
-  }
+float yaw = getYaw();
 
+Coordinates currLocation = getCoordinates();
 
- if (! bno08x.getSensorEvent(&sensorValue)) {
-    return;
-  }
-
-
-switch (sensorValue.sensorId) {
-
-case SH2_GAME_ROTATION_VECTOR:
-    Serial.print("Game Rotation Vector - r: ");
-    Serial.print(sensorValue.un.gameRotationVector.real);
-    Serial.print(" i: ");
-    Serial.print(sensorValue.un.gameRotationVector.i);
-    Serial.print(" j: ");
-    Serial.print(sensorValue.un.gameRotationVector.j);
-    Serial.print(" k: ");
-    Serial.println(sensorValue.un.gameRotationVector.k);
-    break;
-}
-
-
-// Serial.print("Sensor 1: ");
-// Serial.print(sensors[0].read());
-// Serial.print("\t");
-// Serial.print("Sensor 2: ");
-// Serial.print(sensors[1].read());
-// Serial.print("\t");
-// Serial.print("Sensor 3: ");
-// Serial.print(sensors[2].read());
-// Serial.print("\t");
-// Serial.print("Sensor 4: ");
-// Serial.print(sensors[3].read());
-
-double halfRobotWidthx = 72.0;
-double halfRobotWidthy = 135.0;
-
-double sensor1 = static_cast<double>(sensors[0].read());
-// Serial.print(sensor1);
-// Serial.print("\t");
-double sensor2 = static_cast<double>(sensors[1].read());
-// Serial.print(sensor2);
-// Serial.print("\t");
-double sensor3 = static_cast<double>(sensors[2].read());
-// Serial.print(sensor3);
-// Serial.print("\t");
-double sensor4 = static_cast<double>(sensors[3].read());
-// Serial.println(sensor4);
-
-
-double x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(2438 - halfRobotWidthx - sensor3);
-double y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(2438 - halfRobotWidthy - sensor2);
-
-Serial.print("X-coordinate ");
-Serial.print(x/25.4);
+Serial.print("Yaw: ");
+Serial.print(yaw);
+Serial.print("X-coordinate: ");
+Serial.print(currLocation.x);
 Serial.print("\t");
-Serial.print("Y-coordinate ");
-Serial.print(y/25.4);
-Serial.print("\t");
+Serial.print("Y-coordinate: ");
+Serial.print(currLocation.y);
+Serial.println("\t");
+
+// TODO: Need to implement functions for getting new sensor data if going to use switch statement
+
+
+// switch (currentLocation){
+//   case A:
+//     // Do something
+
+//   case B: 
+//     // Do something
+//   case C: 
+//     // Do something
+//   case D: 
+//     // Do something
+//   case E: 
+//     // Do something
+//   case F: 
+//     // Do something
+//   case G:
+//     // Do something
+//   case H: 
+//     // Do something
+// }
+
+
 
 
 
