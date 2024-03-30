@@ -241,15 +241,15 @@ float yaw = getYaw();
 
 Coordinates currLocation = getCoordinates();
 
-Serial.print("Yaw: ");
-Serial.print(yaw);
-Serial.print("\t");
-Serial.print("X-coordinate: ");
-Serial.print(currLocation.x);
-Serial.print("\t");
-Serial.print("Y-coordinate: ");
-Serial.print(currLocation.y);
-Serial.println("\t");
+// Serial.print("Yaw: ");
+// Serial.print(yaw);
+// Serial.print("\t");
+// Serial.print("X-coordinate: ");
+// Serial.print(currLocation.x);
+// Serial.print("\t");
+// Serial.print("Y-coordinate: ");
+// Serial.print(currLocation.y);
+// Serial.println("\t");
 
 // TODO: Need to implement functions for getting new sensor data if going to use switch statement
 
@@ -258,60 +258,103 @@ switch (currentState){
   case stateA:
     while(coilD.y - getCoordinates().y > 0){
       // drive forward
+      Serial.println("Driving Forward");
     }
 
     while(coilD.x - getCoordinates().x > 0){
       // drive right
+      Serial.println("Driving Right");
     }
+    currentState = getNextState(currentState);
+    Serial.print("Arrived at ");
+    Serial.println(currentState);
   case stateB: 
     while(coilD.y - getCoordinates().y > 0){
       // drive forward
+      Serial.println("Driving forward");
     }
     while(getCoordinates().x - coilG.x){
       // drive left
+      Serial.println("Driving left");
     }
+    currentState = getNextState(currentState);
+    Serial.print("Arrived at: ");
+    Serial.println(currentState);
+
   case stateC: 
     while(getCoordinates().x - coilA.x > 0){
       // drive left
+      Serial.println("Driving left");
     }
     while(getCoordinates().y - coilA.y > 0){
       // drive backward
+      Serial.println("Driving Backward");
     }
+    currentState = getNextState(currentState);
   case stateD: 
     while(getCoordinates().x - coilH.x > 0){
       // drive left
+      Serial.println("Driving left");
     }
     while(getCoordinates().y - coilH.y > 0){
       //drive backward
+      Serial.println("Driving backward");
     }
+    currentState = getNextState(currentState);
+    Serial.print("Arrived at ");
+    Serial.println(currentState);
+
   case stateE: 
     while(getCoordinates().y - coilC.y > 0){
       // drive backward
+      Serial.println("Driving backward");
     }
     while(coilA.x - getCoordinates().x > 0){
       // drive right
+      Serial.println("Driving Right");
     }
+    currentState = getNextState(currentState);
+    Serial.print("Arrived at ");
+    Serial.println(currentState);
+
   case stateF:
     while(getCoordinates().y - coilB.y > 0){
       // drive backward
+      Serial.println("Driving backward");
     } 
     while(coilB.x - getCoordinates().x > 0){
       // drive right
+      Serial.println("Driving Right");
     }
+    Serial.print("Arrived at ");
+    Serial.println(currentState);
+    currentState = getNextState(currentState);
+
   case stateG:
     while(coilE.x - getCoordinates().x > 0){
       // drive right
+      Serial.println("Driving Right");
     }
     while(coilE.y - getCoordinates().y > 0){
       // drive forward
+      Serial.println("Driving forward");
     }
+    currentState = getNextState(currentState);
+    Serial.print("Arrived at ");
+    Serial.println(currentState);
+
   case stateH: 
     while(coilF.x - getCoordinates().x > 0){
       // drive right
+      Serial.println("Driving right");
     }
     while(coilF.y - getCoordinates().y > 0){
       // drive forward
+      Serial.println("Driving forward");
     }
+    currentState = getNextState(currentState);
+    Serial.print("Arrived at ");
+    Serial.println(currentState);
 }
 
 
