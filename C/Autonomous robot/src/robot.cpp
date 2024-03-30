@@ -234,10 +234,11 @@ State getNextState(State currentState){
 
 State currentState = stateH; // initialize the starting location of the robot
 
+const float initialYaw = getYaw();
 
 void loop(){
 
-float yaw = getYaw();
+
 
 Coordinates currLocation = getCoordinates();
 
@@ -258,6 +259,7 @@ switch (currentState){
   case stateA:
     while(coilD.y - getCoordinates().y > 0){
       // drive forward
+      yaw = getYaw();
       Serial.println("Driving Forward");
     }
 
