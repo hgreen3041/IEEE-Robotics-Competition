@@ -152,21 +152,23 @@ Coordinates getCoordinates(){
 
   Coordinates location;
   // Set the half-width and half-length of the robot. 
-  double halfRobotWidthx = 72.0;
-  double halfRobotWidthy = 135.0;
+  double halfRobotWidthx = 3.75;
+  double halfRobotWidthy = 5.25;
 
   // Read the sensors
   double sensor1 = static_cast<double>(sensors[0].read());
+  sensor1 = sensor1/25.4;
   double sensor2 = static_cast<double>(sensors[1].read());
+  sensor2 = sensor2/25.4;
   double sensor3 = static_cast<double>(sensors[2].read());
+  sensor3 = sensor3/25.4;
   double sensor4 = static_cast<double>(sensors[3].read());
+  sensor4 = sensor4/25.4;
 
   // Calculate coordinates from sensor data
-  double x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(2438 - halfRobotWidthx - sensor3);
-  double y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(2438 - halfRobotWidthy - sensor2);
+  double x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(96 - halfRobotWidthx - sensor3);
+  double y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(96 - halfRobotWidthy - sensor2);
 
-  x = x/25.4; // Convert to inches
-  y = y/25.4; // convert to inches
 
   location = {x, y};
 
@@ -201,15 +203,18 @@ float getYaw(){
 
 }
 
+
+
 // Coil locations in inches
-const Coordinates coilA = {32.0, 0.0};
-const Coordinates coilB = {64.0, 0.0};
-const Coordinates coilC = {96.0, 32.0};
-const Coordinates coilD = {96.0, 64.0};
-const Coordinates coilE = {64.0, 96.0};
-const Coordinates coilF = {32.0, 32.0};
-const Coordinates coilG = {0.0, 64.0};
-const Coordinates coilH = {0.0, 32.0};
+// additions/subtractions are for the offset of the robot
+const Coordinates coilA = {32.0, 0.0 + 6.25};
+const Coordinates coilB = {64.0, 0.0 + 6.25};
+const Coordinates coilC = {96.0 - 4.75, 32.0};
+const Coordinates coilD = {96.0 - 4.75, 64.0};
+const Coordinates coilE = {64.0, 96.0 - 6.25};
+const Coordinates coilF = {32.0, 96.0 - 6.25};
+const Coordinates coilG = {0.0 + 4.75, 64.0};
+const Coordinates coilH = {0.0 + 4.75, 32.0};
 
 // Create states (last known coil)
 enum State { stateA, stateD, stateH, stateF, stateB, stateG, stateE, stateC }; 
@@ -283,6 +288,10 @@ switch (currentState){
 double errorx = destination.x - getCoordinates().x; 
 double errory = destination.y - getCoordinates().y;
 double erroryaw = initialYaw - getYaw();
+
+
+// "P" loop for motor control
+// TODO: Add tolerance (error will never actually be 0)
 
 while(errorx != 0 || errory != 0 || erroryaw != 0){
   int pwmy = int(errorx);
