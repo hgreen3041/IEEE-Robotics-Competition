@@ -282,16 +282,23 @@ switch (currentState){
 
 double errorx = destination.x - getCoordinates().x; 
 double errory = destination.y - getCoordinates().y;
+double erroryaw = initialYaw - getYaw();
 
-while(errorx != 0 || errory != 0){
+while(errorx != 0 || errory != 0 || erroryaw != 0){
   int pwmy = int(errorx);
-  robot.xMovement(errorx*5);
+  robot.xMovement(pwmy*5);
 
   int pwmx = int(errory);
-  robot.yMovement(errory*5);
+  robot.yMovement(pwmx*5);
+
+  int pwmyaw = int(erroryaw);
+  robot.rotationalMovement(pwmyaw*5);
 
   errorx = destination.x - getCoordinates().x;
   errory = destination.y - getCoordinates().y;
+  erroryaw = initialYaw - getYaw();
+
+  currentState = getNextState(currentState);
 
 }
 
