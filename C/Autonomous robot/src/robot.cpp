@@ -2,6 +2,8 @@
 #include <Adafruit_BNO08x.h>
 #include <iostream>
 #include <Arduino.h>
+#include "motordriver.cpp"
+
 
 // initialize LED
 const int led = 25;
@@ -45,6 +47,8 @@ const uint8_t xshutPins[sensorCount] = {6,22,17,16};
 // Create sensors object
 VL53L1X sensors[sensorCount];
 
+// Create motor driver object 
+motordriver robot;
 
 
 
@@ -240,7 +244,9 @@ void loop(){
 
 
 
-Coordinates currLocation = getCoordinates();
+// Coordinates currLocation = getCoordinates();
+
+Coordinates destination;
 
 // Serial.print("Yaw: ");
 // Serial.print(yaw);
@@ -254,110 +260,150 @@ Coordinates currLocation = getCoordinates();
 
 // TODO: Need to implement functions for getting new sensor data if going to use switch statement
 
-
+// OPTION 1 -----------------------------------------------------------------------------------------------
 switch (currentState){
-  case stateA:
-    while(coilD.y - getCoordinates().y > 0){
-      // drive forward
-      yaw = getYaw();
-      Serial.println("Driving Forward");
-    }
-
-    while(coilD.x - getCoordinates().x > 0){
-      // drive right
-      Serial.println("Driving Right");
-    }
-    currentState = getNextState(currentState);
-    Serial.print("Arrived at ");
-    Serial.println(currentState);
-  case stateB: 
-    while(coilD.y - getCoordinates().y > 0){
-      // drive forward
-      Serial.println("Driving forward");
-    }
-    while(getCoordinates().x - coilG.x){
-      // drive left
-      Serial.println("Driving left");
-    }
-    currentState = getNextState(currentState);
-    Serial.print("Arrived at: ");
-    Serial.println(currentState);
-
-  case stateC: 
-    while(getCoordinates().x - coilA.x > 0){
-      // drive left
-      Serial.println("Driving left");
-    }
-    while(getCoordinates().y - coilA.y > 0){
-      // drive backward
-      Serial.println("Driving Backward");
-    }
-    currentState = getNextState(currentState);
-  case stateD: 
-    while(getCoordinates().x - coilH.x > 0){
-      // drive left
-      Serial.println("Driving left");
-    }
-    while(getCoordinates().y - coilH.y > 0){
-      //drive backward
-      Serial.println("Driving backward");
-    }
-    currentState = getNextState(currentState);
-    Serial.print("Arrived at ");
-    Serial.println(currentState);
-
-  case stateE: 
-    while(getCoordinates().y - coilC.y > 0){
-      // drive backward
-      Serial.println("Driving backward");
-    }
-    while(coilA.x - getCoordinates().x > 0){
-      // drive right
-      Serial.println("Driving Right");
-    }
-    currentState = getNextState(currentState);
-    Serial.print("Arrived at ");
-    Serial.println(currentState);
-
+  case stateA: 
+    destination = coilD;
+  case stateB:
+    destination = coilG;
+  case stateC:
+    destination = coilA;
+  case stateD:
+    destination = coilH;
+  case stateE:
+    destination = coilC;
   case stateF:
-    while(getCoordinates().y - coilB.y > 0){
-      // drive backward
-      Serial.println("Driving backward");
-    } 
-    while(coilB.x - getCoordinates().x > 0){
-      // drive right
-      Serial.println("Driving Right");
-    }
-    Serial.print("Arrived at ");
-    Serial.println(currentState);
-    currentState = getNextState(currentState);
-
+    destination = coilB;
   case stateG:
-    while(coilE.x - getCoordinates().x > 0){
-      // drive right
-      Serial.println("Driving Right");
-    }
-    while(coilE.y - getCoordinates().y > 0){
-      // drive forward
-      Serial.println("Driving forward");
-    }
-    currentState = getNextState(currentState);
-    Serial.print("Arrived at ");
-    Serial.println(currentState);
-
-  case stateH: 
-    while(coilF.x - getCoordinates().x > 0){
-      // drive right
-      Serial.println("Driving right");
-    }
-    while(coilF.y - getCoordinates().y > 0){
-      // drive forward
-      Serial.println("Driving forward");
-    }
-    currentState = getNextState(currentState);
-    Serial.print("Arrived at ");
-    Serial.println(currentState);
+    destination = coilE;
+  case stateH:
+    destination = coilF;
 }
+
+double errorx = destination.x - getCoordinates().x; 
+double errory = destination.y - getCoordinates().y;
+
+while(errorx != 0 || errory != 0){
+  int pwmy = int(errorx);
+  robot.xMovement(errorx*5);
+
+  int pwmx = int(errory);
+  robot.yMovement(errory*5);
+
+  errorx = destination.x - getCoordinates().x;
+  errory = destination.y - getCoordinates().y;
+
+}
+
+
+
+// OPTION 2--------------------------------------------------------------------------
+// TODO: Change while condition to utilize xMovement and yMovement in driver file
+//        - implement IMU
+
+// switch (currentState){
+//   case stateA:
+//     while(coilD.y - getCoordinates().y > 0){
+//       // drive forward
+//       Serial.println("Driving Forward");
+//     }
+
+//     while(coilD.x - getCoordinates().x > 0){
+//       // drive right
+//       Serial.println("Driving Right");
+//     }
+//     currentState = getNextState(currentState);
+//     Serial.print("Arrived at ");
+//     Serial.println(currentState);
+
+//   case stateB: 
+//     while(coilD.y - getCoordinates().y > 0){
+//       // drive forward
+//       Serial.println("Driving forward");
+//     }
+//     while(getCoordinates().x - coilG.x){
+//       // drive left
+//       Serial.println("Driving left");
+//     }
+//     currentState = getNextState(currentState);
+//     Serial.print("Arrived at: ");
+//     Serial.println(currentState);
+
+//   case stateC: 
+//     while(getCoordinates().x - coilA.x > 0){
+//       // drive left
+//       Serial.println("Driving left");
+//     }
+//     while(getCoordinates().y - coilA.y > 0){
+//       // drive backward
+//       Serial.println("Driving Backward");
+//     }
+//     currentState = getNextState(currentState);
+//   case stateD: 
+//     while(getCoordinates().x - coilH.x > 0){
+//       // drive left
+//       Serial.println("Driving left");
+//     }
+//     while(getCoordinates().y - coilH.y > 0){
+//       //drive backward
+//       Serial.println("Driving backward");
+//     }
+//     currentState = getNextState(currentState);
+//     Serial.print("Arrived at ");
+//     Serial.println(currentState);
+
+//   case stateE: 
+//     while(getCoordinates().y - coilC.y > 0){
+//       // drive backward
+//       Serial.println("Driving backward");
+//     }
+//     while(coilA.x - getCoordinates().x > 0){
+//       // drive right
+//       Serial.println("Driving Right");
+//     }
+//     currentState = getNextState(currentState);
+//     Serial.print("Arrived at ");
+//     Serial.println(currentState);
+
+//   case stateF:
+//     while(getCoordinates().y - coilB.y > 0){
+//       // drive backward
+//       Serial.println("Driving backward");
+//     } 
+//     while(coilB.x - getCoordinates().x > 0){
+//       // drive right
+//       Serial.println("Driving Right");
+//     }
+//     Serial.print("Arrived at ");
+//     Serial.println(currentState);
+//     currentState = getNextState(currentState);
+
+//   case stateG:
+//     while(coilE.x - getCoordinates().x > 0){
+//       // drive right
+//       Serial.println("Driving Right");
+//     }
+//     while(coilE.y - getCoordinates().y > 0){
+//       // drive forward
+//       Serial.println("Driving forward");
+//     }
+//     currentState = getNextState(currentState);
+//     Serial.print("Arrived at ");
+//     Serial.println(currentState);
+
+//   case stateH: 
+//     while(coilF.x - getCoordinates().x > 0){
+//       // drive right
+//       Serial.println("Driving right");
+//     }
+//     while(coilF.y - getCoordinates().y > 0){
+//       // drive forward
+//       Serial.println("Driving forward");
+//     }
+//     currentState = getNextState(currentState);
+//     Serial.print("Arrived at ");
+//     Serial.println(currentState);
+// }
 
 
 

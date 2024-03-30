@@ -1,7 +1,6 @@
-// Motordriver.cpp
-// Drive functions specific to IEEE robot
-#include <Arduino.h>
-//#include <motordriver.h>
+#include <Arduino.h> 
+#include <cmath>    
+
 
 // Constructor
 class motordriver {
@@ -48,10 +47,135 @@ public:
         // Clean up resources if needed
     }
 
-// Public method definitions
-void setup() {
-    // Initialization code, if needed
-    
+
+
+    /*
+    Handles all forward and backward movement.
+
+    Args: 
+    pwm(int)
+     - Positive pwm for forward 
+     - negative pwm for backward
+
+    Returns: 
+    None
+    */
+
+void yMovement(int pwm){
+    if(pwm >= 0 ){
+        analogWrite(FL, pwm);
+        digitalWrite(FLDir, LOW);
+
+        analogWrite(FR, pwm);
+        digitalWrite(FRDir, LOW);
+
+        analogWrite(BL, pwm);
+        digitalWrite(BLDir, LOW);
+
+        analogWrite(BR, pwm);
+        digitalWrite(BRDir, LOW);
+    }
+
+    else{
+        pwm = abs(pwm);
+        analogWrite(FL, pwm);
+        digitalWrite(FLDir, HIGH);
+
+        analogWrite(FR, pwm);
+        digitalWrite(FRDir, HIGH);
+
+        analogWrite(BL, pwm);
+        digitalWrite(BLDir, HIGH);
+
+        analogWrite(BR, pwm);
+        digitalWrite(BRDir, HIGH); 
+    }
+}
+
+    /*
+    Handles all x-movement (left and right).
+
+    Args: 
+    pwm(int)
+        -   positive pwm for right. 
+        -   negative pwm for left. 
+
+    Returns: 
+    None
+    */
+
+void xMovement(int pwm){
+    if(pwm >= 0){
+        analogWrite(FL, pwm);
+        digitalWrite(FLDir, LOW);
+
+        analogWrite(FR, pwm);
+        digitalWrite(FRDir, HIGH);
+
+        analogWrite(BL, pwm);
+        digitalWrite(BLDir, HIGH);
+
+        analogWrite(BR, pwm);
+        digitalWrite(BRDir, LOW);  
+    }
+
+    else {
+        pwm = abs(pwm);
+        analogWrite(FL, pwm);
+        digitalWrite(FLDir, HIGH);
+
+        analogWrite(FR, pwm);
+        digitalWrite(FRDir, LOW);
+
+        analogWrite(BL, pwm);
+        digitalWrite(BLDir, LOW);
+
+        analogWrite(BR, pwm);
+        digitalWrite(BRDir, HIGH);
+    }
+}
+
+/*
+Handles all rotational movement.
+Args: 
+    pwm(int)
+        -   positive for counterclockwise. 
+        -   negative for clockwise. 
+
+
+Returns: 
+None
+*/
+
+void rotationalMovement(int pwm){
+    if(pwm >= 0){
+        analogWrite(FL, pwm);
+        digitalWrite(FLDir, HIGH);
+
+        analogWrite(FR, pwm);
+        digitalWrite(FRDir, LOW);
+
+        analogWrite(BL, pwm);
+        digitalWrite(BLDir, HIGH);
+
+        analogWrite(BR, pwm);
+        digitalWrite(BRDir, LOW);
+    }
+
+    else{
+        pwm = abs(pwm);
+        analogWrite(FL, pwm);
+        digitalWrite(FLDir, LOW);
+
+        analogWrite(FR, pwm);
+        digitalWrite(FRDir, HIGH);
+
+        analogWrite(BL, pwm);
+        digitalWrite(BLDir, LOW);
+
+        analogWrite(BR, pwm);
+        digitalWrite(BRDir, HIGH);
+    }
 }
 
 void moveForward(int pwm){
@@ -76,17 +200,6 @@ void moveForward(int pwm){
    analogWrite(BR, pwm);
    digitalWrite(BRDir, LOW);
 }
-
-
-/*
-
-File that establishes basic movement omni-whel in C++/Arduino
-Forward, backward, right, left, 45, 135, 225, 315
-
-*/
-
-// LED
-
 
 
 
