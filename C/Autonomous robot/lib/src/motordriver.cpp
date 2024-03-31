@@ -1,49 +1,26 @@
 #include <Arduino.h> 
-#include <cmath>    
+#include <cmath>   
+#include <motordriver.h> 
 
 
 // Constructor
-class motordriver {
-public:
-    const int MAX_PWM = 255;
-
-    // Pins for front-left motor
-    const int FL = 15;
-    const int FLDir = 13;
-
-    // Pins for front-right motor
-    const int FR = 14;
-    const int FRDir = 12; 
-
-    // Pins for back-left motor
-    const int BL = 18;
-    const int BLDir = 20;
-
-    // Pins for back-right motor
-    const int BR = 19;
-    const int BRDir = 21;
-    motordriver() {
-
-
-    //setup
-
+motordriver :: motordriver(){
+        // Setup motor pins
     pinMode(FL, OUTPUT);
     pinMode(FLDir, OUTPUT);
-
     pinMode(FR, OUTPUT);
     pinMode(FRDir, OUTPUT);
-
     pinMode(BL, OUTPUT);
     pinMode(BLDir, OUTPUT);
-
     pinMode(BR, OUTPUT);
     pinMode(BRDir, OUTPUT);
-    //end setup
 
-    }
+}
+
+
 
 // Destructor
-    ~motordriver() {
+    motordriver :: ~motordriver() {
         // Clean up resources if needed
     }
 
@@ -61,7 +38,7 @@ public:
     None
     */
 
-void yMovement(int pwm){
+void motordriver :: yMovement(int pwm){
     if(pwm >= 0 ){
         analogWrite(FL, pwm);
         digitalWrite(FLDir, LOW);
@@ -104,7 +81,7 @@ void yMovement(int pwm){
     None
     */
 
-void xMovement(int pwm){
+void motordriver :: xMovement(int pwm){
     if(pwm >= 0){
         analogWrite(FL, pwm);
         digitalWrite(FLDir, LOW);
@@ -147,7 +124,7 @@ Returns:
 None
 */
 
-void rotationalMovement(int pwm){
+void motordriver :: rotationalMovement(int pwm){
     if(pwm >= 0){
         analogWrite(FL, pwm);
         digitalWrite(FLDir, HIGH);
@@ -178,7 +155,7 @@ void rotationalMovement(int pwm){
     }
 }
 
-void moveForward(int pwm){
+void motordriver :: moveForward(int pwm){
     /*
     Moves the robot forward at the given speed
 
@@ -204,7 +181,7 @@ void moveForward(int pwm){
 
 
 
-void moveBackward(int pwm){
+void motordriver :: moveBackward(int pwm){
     /*
     Moves the robot backward at the given speed
 
@@ -228,7 +205,7 @@ void moveBackward(int pwm){
 
 }
 
-void moveRight(int pwm){
+void motordriver :: moveRight(int pwm){
     /*
     Moves the robot right at the given speed
 
@@ -251,7 +228,7 @@ void moveRight(int pwm){
     digitalWrite(BRDir, LOW); 
 }
 
-void moveLeft(int pwm){
+void motordriver :: moveLeft(int pwm){
     /*
     Moves the robot left at the given speed
 
@@ -274,7 +251,7 @@ void moveLeft(int pwm){
     digitalWrite(BRDir, HIGH); 
 }
 
-void move45(int pwm){
+void motordriver :: move45(int pwm){
     /*
     Moves the robot +45 degrees with respect to the x-axis at the given speed
 
@@ -298,7 +275,7 @@ void move45(int pwm){
     digitalWrite(BRDir, LOW); 
 }
 
-void move135(int pwm){
+void motordriver :: move135(int pwm){
     /*
     Moves the robot +135 degrees with respect to the x-axis at the given speed
 
@@ -322,7 +299,7 @@ void move135(int pwm){
     digitalWrite(BRDir, LOW); 
 }
 
-void move315(int pwm){
+void motordriver :: move315(int pwm){
     /*
     Moves the robot +315 degrees with respect to the x-axis at the given speed
 
@@ -346,7 +323,7 @@ void move315(int pwm){
     digitalWrite(BRDir, LOW); 
 }
 
-void move225(int pwm){
+void motordriver :: move225(int pwm){
     /*
     Moves the robot +225 degrees with respect to the x-axis at the given speed
 
@@ -370,7 +347,7 @@ void move225(int pwm){
     digitalWrite(BRDir, HIGH); 
 }
 
-void stopMotors(){
+void motordriver :: stopMotors(){
     /*
     Shuts off all PWM signals
 
@@ -389,4 +366,3 @@ void stopMotors(){
 }
 
 
-};

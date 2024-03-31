@@ -2,8 +2,7 @@
 #include <Adafruit_BNO08x.h>
 #include <iostream>
 #include <Arduino.h>
-#include "motordriver.cpp"
-
+// #include <motordriver.h>
 
 // initialize LED
 const int led = 25;
@@ -48,7 +47,7 @@ const uint8_t xshutPins[sensorCount] = {6,22,17,16};
 VL53L1X sensors[sensorCount];
 
 // Create motor driver object 
-motordriver robot;
+// motordriver robot;
 
 
 
@@ -253,67 +252,69 @@ void loop(){
 
 Coordinates destination;
 
-// Serial.print("Yaw: ");
-// Serial.print(yaw);
-// Serial.print("\t");
-// Serial.print("X-coordinate: ");
-// Serial.print(currLocation.x);
-// Serial.print("\t");
-// Serial.print("Y-coordinate: ");
-// Serial.print(currLocation.y);
-// Serial.println("\t");
+Serial.print("Yaw: ");
+Serial.print(getYaw());
+Serial.print("\t");
+Serial.print("X-coordinate: ");
+Serial.print(getCoordinates().x);
+Serial.print("\t");
+Serial.print("Y-coordinate: ");
+Serial.print(getCoordinates().y);
+Serial.println("\t");
 
 // TODO: Need to implement functions for getting new sensor data if going to use switch statement
 
 // OPTION 1 -----------------------------------------------------------------------------------------------
-switch (currentState){
-  case stateA: 
-    destination = coilD;
-  case stateB:
-    destination = coilG;
-  case stateC:
-    destination = coilA;
-  case stateD:
-    destination = coilH;
-  case stateE:
-    destination = coilC;
-  case stateF:
-    destination = coilB;
-  case stateG:
-    destination = coilE;
-  case stateH:
-    destination = coilF;
-}
+// switch (currentState){
+//   case stateA: 
+//     destination = coilD;
+//   case stateB:
+//     destination = coilG;
+//   case stateC:
+//     destination = coilA;
+//   case stateD:
+//     destination = coilH;
+//   case stateE:
+//     destination = coilC;
+//   case stateF:
+//     destination = coilB;
+//   case stateG:
+//     destination = coilE;
+//   case stateH:
+//     destination = coilF;
+// }
 
-double errorx = destination.x - getCoordinates().x; 
-double errory = destination.y - getCoordinates().y;
-double erroryaw = initialYaw - getYaw();
+// double errorx = destination.x - getCoordinates().x; 
+// double errory = destination.y - getCoordinates().y;
+// double erroryaw = initialYaw - getYaw();
 
 
 // "P" loop for motor control
 // TODO: Add tolerance (error will never actually be 0)
 
-while(errorx != 0 || errory != 0 || erroryaw != 0){
-  int pwmy = int(errorx);
-  robot.xMovement(pwmy*5);
+// while(errorx != 0 || errory != 0 || erroryaw != 0){
+//   int pwmy = int(errorx);
+//   robot.xMovement(pwmy*5);
 
-  int pwmx = int(errory);
-  robot.yMovement(pwmx*5);
+//   int pwmx = int(errory);
+//   robot.yMovement(pwmx*5);
 
-  int pwmyaw = int(erroryaw);
-  robot.rotationalMovement(pwmyaw*5);
+//   int pwmyaw = int(erroryaw);
+//   robot.rotationalMovement(pwmyaw*5);
 
-  errorx = destination.x - getCoordinates().x;
-  errory = destination.y - getCoordinates().y;
-  erroryaw = initialYaw - getYaw();
+//   errorx = destination.x - getCoordinates().x;
+//   errory = destination.y - getCoordinates().y;
+//   erroryaw = initialYaw - getYaw();
 
-  currentState = getNextState(currentState);
+//   currentState = getNextState(currentState);
 
-}
+// }
 
 
 
 // OPTION 2--------------------------------------------------------------------------
+// dummy loop
+
 // TODO: Change while condition to utilize xMovement and yMovement in driver file
 //        - implement IMU
 
