@@ -2,7 +2,8 @@
 #include <Adafruit_BNO08x.h>
 #include <iostream>
 #include <Arduino.h>
-// #include <motordriver.h>
+#include <stdio.h>
+#include <motordriver.h>
 
 // initialize LED
 const int led = 25;
@@ -47,9 +48,7 @@ const uint8_t xshutPins[sensorCount] = {6,22,17,16};
 VL53L1X sensors[sensorCount];
 
 // Create motor driver object 
-// motordriver robot;
-
-
+motordriver robot;
 
 
 
@@ -147,7 +146,7 @@ struct Coordinates{
 };
 
 // Function to retrieve the current location of the robot
-Coordinates getCoordinates(){
+struct Coordinates getCoordinates(){
 
   Coordinates location;
   // Set the half-width and half-length of the robot. 
@@ -219,26 +218,27 @@ const Coordinates coilH = {0.0 + 4.75, 32.0};
 enum State { stateA, stateD, stateH, stateF, stateB, stateG, stateE, stateC }; 
 
 // Returns the next state given the current state of the robot.
-State getNextState(State currentState){
-  switch(currentState){
-    case stateA:
-      return stateD;
-    case stateD: 
-      return stateH;
-    case stateH:
-      return stateF;
-    case stateF: 
-      return stateB;
-    case stateB: 
-      return stateG;
-    case stateG:
-      return stateE;
-    case stateE:
-      return stateC;
-    case stateC:
-      return stateA;
-  }
-}
+// State getNextState(State currentState){
+//   switch(currentState){
+//     case stateA:
+//       return stateD;
+//     case stateD: 
+//       return stateH;
+//     case stateH:
+//       return stateF;
+//     case stateF: 
+//       return stateB;
+//     case stateB: 
+//       return stateG;
+//     case stateG:
+//       return stateE;
+//     case stateE:
+//       return stateC;
+//     case stateC:
+//       return stateA;
+//   }
+//   return stateA;
+// }
 
 State currentState = stateH; // initialize the starting location of the robot
 
@@ -262,53 +262,64 @@ Serial.print("Y-coordinate: ");
 Serial.print(getCoordinates().y);
 Serial.println("\t");
 
+
+
 // TODO: Need to implement functions for getting new sensor data if going to use switch statement
 
 // OPTION 1 -----------------------------------------------------------------------------------------------
-// switch (currentState){
-//   case stateA: 
-//     destination = coilD;
-//   case stateB:
-//     destination = coilG;
-//   case stateC:
-//     destination = coilA;
-//   case stateD:
-//     destination = coilH;
-//   case stateE:
-//     destination = coilC;
-//   case stateF:
-//     destination = coilB;
-//   case stateG:
-//     destination = coilE;
-//   case stateH:
-//     destination = coilF;
-// }
 
-// double errorx = destination.x - getCoordinates().x; 
-// double errory = destination.y - getCoordinates().y;
-// double erroryaw = initialYaw - getYaw();
+switch (currentState){
+  case stateA: 
+    destination = coilD;
+    currentState = stateD;
+  case stateB:
+    destination = coilG;
+    currentState = stateG;
+  case stateC:
+    destination = coilA;
+    currentState = stateA;
+  case stateD:
+    destination = coilH;
+    currentState = stateH;
+  case stateE:
+    destination = coilC;
+    currentState = stateC;
+  case stateF:
+    destination = coilB;
+    currentState = stateB;
+  case stateG:
+    destination = coilE;
+    currentState = stateE;
+  case stateH:
+    destination = coilF;
+    currentState = stateF;
+}
+
+double errorx = destination.x - getCoordinates().x; 
+double errory = destination.y - getCoordinates().y;
+double erroryaw = initialYaw - getYaw();
 
 
 // "P" loop for motor control
 // TODO: Add tolerance (error will never actually be 0)
 
-// while(errorx != 0 || errory != 0 || erroryaw != 0){
-//   int pwmy = int(errorx);
-//   robot.xMovement(pwmy*5);
+while(errorx != 0 || errory != 0 || erroryaw != 0){
+  int pwmy = int(errorx);
+  robot.xMovement(pwmy*5);
 
-//   int pwmx = int(errory);
-//   robot.yMovement(pwmx*5);
+  int pwmx = int(errory);
+  robot.yMovement(pwmx*5);
 
-//   int pwmyaw = int(erroryaw);
-//   robot.rotationalMovement(pwmyaw*5);
+  int pwmyaw = int(erroryaw);
+  robot.rotationalMovement(pwmyaw*5);
 
-//   errorx = destination.x - getCoordinates().x;
-//   errory = destination.y - getCoordinates().y;
-//   erroryaw = initialYaw - getYaw();
+  errorx = destination.x - getCoordinates().x;
+  errory = destination.y - getCoordinates().y;
+  erroryaw = initialYaw - getYaw();
 
-//   currentState = getNextState(currentState);
+  
 
-// }
+}
 
 
 
