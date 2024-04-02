@@ -1,38 +1,40 @@
 #include <Arduino.h>
 
 
-const int led = 25;
+const int led = 4;
 const int TX = 8;
 const int RX = 9;
 
 const int Button = 2;
 
+const int pin = 5;
+
 
 
 void radioSetup(){
-  Serial2.println("AT+RESET");
-  Serial.print("Response: ");
-  Serial.println(Serial2.readString());
-  Serial.println(Serial2.readString());
-  Serial2.println("AT+BAND=915000000");
-  Serial.print("Response: ");
-  Serial.println(Serial2.readString());
-  Serial2.println("AT+NETWORKID=5");
-  Serial.print("Response: ");
-  Serial.println(Serial2.readString());
-  Serial2.println("AT+ADDRESS=123");
-  Serial.print("Response: ");
-  Serial.println(Serial2.readString());
-
   // Serial2.println("AT+RESET");
-  // Serial2.readString();
-  // Serial2.readString();
+  // Serial.print("Response: ");
+  // Serial.println(Serial2.readString());
+  // Serial.println(Serial2.readString());
   // Serial2.println("AT+BAND=915000000");
-  // Serial2.readString();
+  // Serial.print("Response: ");
+  // Serial.println(Serial2.readString());
   // Serial2.println("AT+NETWORKID=5");
-  // Serial2.readString();
+  // Serial.print("Response: ");
+  // Serial.println(Serial2.readString());
   // Serial2.println("AT+ADDRESS=123");
-  // Serial2.readString();
+  // Serial.print("Response: ");
+  // Serial.println(Serial2.readString());
+
+  Serial2.println("AT+RESET");
+  Serial2.readString();
+  Serial2.readString();
+  Serial2.println("AT+BAND=915000000");
+  Serial2.readString();
+  Serial2.println("AT+NETWORKID=5");
+  Serial2.readString();
+  Serial2.println("AT+ADDRESS=123");
+  Serial2.readString();
 
 
 
@@ -49,6 +51,7 @@ void setup() {
 
   pinMode(led, OUTPUT);
   pinMode(Button, INPUT);
+  pinMode(pin, INPUT);
 
   // receiver only
   while(!Serial){}
