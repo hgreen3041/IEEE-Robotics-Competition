@@ -157,26 +157,22 @@ struct Coordinates getCoordinates(){
   double halfRobotWidthy = 5.25;
 
   // Read the sensors
-  // double sensor1 = static_cast<double>(sensors[0].read());
-  // sensor1 = sensor1/25.4;
-  // double sensor2 = static_cast<double>(sensors[1].read());
-  // sensor2 = sensor2/25.4;
-  // double sensor3 = static_cast<double>(sensors[2].read());
-  // sensor3 = sensor3/25.4;
-  // double sensor4 = static_cast<double>(sensors[3].read());
-  // sensor4 = sensor4/25.4;
+  double sensor1 = static_cast<double>(sensors[0].read());
+  sensor1 = sensor1/25.4;
+  double sensor2 = static_cast<double>(sensors[1].read());
+  sensor2 = sensor2/25.4;
+  double sensor3 = static_cast<double>(sensors[2].read());
+  sensor3 = sensor3/25.4;
+  double sensor4 = static_cast<double>(sensors[3].read());
+  sensor4 = sensor4/25.4;
 
-  // double sensor1 = sensors[0].read();
-  // double sensor2 = sensors[1].read();
-  // double sensor3 = sensors[2].read();
-  // double sensor4 = sensors[3].read();
+
 
   // Calculate coordinates from sensor data
-  // double x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(96 - halfRobotWidthx - sensor3);
-  // double y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(96 - halfRobotWidthy - sensor2);
+  double x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(96 - halfRobotWidthx - sensor3);
+  double y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(96 - halfRobotWidthy - sensor2);
 
-  double x = 1; 
-  double y = 0;
+
 
 
   // Serial.println("running");
