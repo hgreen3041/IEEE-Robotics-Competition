@@ -157,29 +157,18 @@ struct Coordinates getCoordinates(){
   double halfRobotWidthy = 5.25;
 
   // Read the sensors
-  // double sensor1 = static_cast<double>(sensors[0].read());
-  // sensor1 = sensor1/25.4;
-  // double sensor2 = static_cast<double>(sensors[1].read());
-  // sensor2 = sensor2/25.4;
-  // double sensor3 = static_cast<double>(sensors[2].read());
-  // sensor3 = sensor3/25.4;
-  // double sensor4 = static_cast<double>(sensors[3].read());
-  // sensor4 = sensor4/25.4;
-
-  // double sensor1 = sensors[0].read();
-  // double sensor2 = sensors[1].read();
-  // double sensor3 = sensors[2].read();
-  // double sensor4 = sensors[3].read();
+  double sensor1 = static_cast<double>(sensors[0].read());
+  sensor1 = sensor1/25.4;
+  double sensor2 = static_cast<double>(sensors[1].read());
+  sensor2 = sensor2/25.4;
+  double sensor3 = static_cast<double>(sensors[2].read());
+  sensor3 = sensor3/25.4;
+  double sensor4 = static_cast<double>(sensors[3].read());
+  sensor4 = sensor4/25.4;
 
   // Calculate coordinates from sensor data
-  // double x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(96 - halfRobotWidthx - sensor3);
-  // double y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(96 - halfRobotWidthy - sensor2);
-
-  double x = 1; 
-  double y = 0;
-
-
-  // Serial.println("running");
+  double x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(96 - halfRobotWidthx - sensor3);
+  double y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(96 - halfRobotWidthy - sensor2);
 
 
   location = {x, y};
@@ -189,33 +178,33 @@ struct Coordinates getCoordinates(){
 
 
 // BREAKS THE CODE FOR SOME UNKNOWN REASON
-float getYaw(){
-    if (bno08x.wasReset()) {
-    Serial.print("sensor was reset ");
-    setReports(reportType, reportIntervalUs);
-  }
+// float getYaw(){
+//     if (bno08x.wasReset()) {
+//     Serial.print("sensor was reset ");
+//     setReports(reportType, reportIntervalUs);
+//   }
   
-  if (bno08x.getSensorEvent(&sensorValue)) {
-    // in this demo only one report type will be received depending on FAST_MODE define (above)
-    switch (sensorValue.sensorId) {
-      case SH2_ARVR_STABILIZED_RV:
-        quaternionToEulerRV(&sensorValue.un.arvrStabilizedRV, &ypr, true);
-      case SH2_GYRO_INTEGRATED_RV:
-        // faster (more noise?)
-        quaternionToEulerGI(&sensorValue.un.gyroIntegratedRV, &ypr, true);
-        break;
-    }
+//   if (bno08x.getSensorEvent(&sensorValue)) {
+//     // in this demo only one report type will be received depending on FAST_MODE define (above)
+//     switch (sensorValue.sensorId) {
+//       case SH2_ARVR_STABILIZED_RV:
+//         quaternionToEulerRV(&sensorValue.un.arvrStabilizedRV, &ypr, true);
+//       case SH2_GYRO_INTEGRATED_RV:
+//         // faster (more noise?)
+//         quaternionToEulerGI(&sensorValue.un.gyroIntegratedRV, &ypr, true);
+//         break;
+//     }
     
-    // Serial.print(ypr.yaw); 
-    // Serial.print("\t");              
-    // Serial.print(ypr.pitch);              
-    // Serial.print("\t");
-    // Serial.println(ypr.roll);
-  }
+//     // Serial.print(ypr.yaw); 
+//     // Serial.print("\t");              
+//     // Serial.print(ypr.pitch);              
+//     // Serial.print("\t");
+//     // Serial.println(ypr.roll);
+//   }
 
-  return ypr.yaw; 
+//   return ypr.yaw; 
 
-}
+// }
 
 
 
@@ -256,28 +245,80 @@ enum State { stateA, stateD, stateH, stateF, stateB, stateG, stateE, stateC };
 //   return stateA;
 // }
 
+    if (bno08x.wasReset()) {
+    Serial.print("sensor was reset ");
+    setReports(reportType, reportIntervalUs);
+  }
+  
+  if (bno08x.getSensorEvent(&sensorValue)) {
+    // in this demo only one report type will be received depending on FAST_MODE define (above)
+    switch (sensorValue.sensorId) {
+      case SH2_ARVR_STABILIZED_RV:
+        quaternionToEulerRV(&sensorValue.un.arvrStabilizedRV, &ypr, true);
+      case SH2_GYRO_INTEGRATED_RV:
+        // faster (more noise?)
+        quaternionToEulerGI(&sensorValue.un.gyroIntegratedRV, &ypr, true);
+        break;
+    }
+    
+    // Serial.print(ypr.yaw); 
+    // Serial.print("\t");              
+    // Serial.print(ypr.pitch);              
+    // Serial.print("\t");
+    // Serial.println(ypr.roll);
+  }
+
+  const float initialYaw = ypr.yaw;
+  float currentYaw;
 
 
 
 
 State currentState = stateH; // initialize the starting location of the robot
-int loopCount = 0;
-float initialYaw; // inital yaw on startup
-Coordinates currLocation;
-Coordinates destination;
-int ledStatus = 1;
-
-int pwmy;
-int pwmx;
-int pwmyaw;
-
 
 
 void loop(){
-if(loopCount < 5){
-  initialYaw = getYaw();
+
+
+    if (bno08x.wasReset()) {
+    Serial.print("sensor was reset ");
+    setReports(reportType, reportIntervalUs);
+  }
+  
+  if (bno08x.getSensorEvent(&sensorValue)) {
+    // in this demo only one report type will be received depending on FAST_MODE define (above)
+    switch (sensorValue.sensorId) {
+      case SH2_ARVR_STABILIZED_RV:
+        quaternionToEulerRV(&sensorValue.un.arvrStabilizedRV, &ypr, true);
+      case SH2_GYRO_INTEGRATED_RV:
+        // faster (more noise?)
+        quaternionToEulerGI(&sensorValue.un.gyroIntegratedRV, &ypr, true);
+        break;
+    }
+    
+    // Serial.print(ypr.yaw); 
+    // Serial.print("\t");              
+    // Serial.print(ypr.pitch);              
+    // Serial.print("\t");
+    // Serial.println(ypr.roll);
+  }
+
+   currentYaw = ypr.yaw;
+
 }
 
+
+Coordinates currLocation = getCoordinates();
+
+
+
+// Serial.print("\t");
+// Serial.print("X-coordinate: ");
+// Serial.print(getCoordinates().x);
+// Serial.print("\t");
+// Serial.print("Y-coordinate: ");
+// Serial.print(getCoordinates().y);
+// Serial.println("\t");
 
 
 
@@ -320,17 +361,12 @@ switch (currentState){
     break;
 }
 
-  currLocation = getCoordinates();
-  double errorx = destination.x - currLocation.x;
-  double errory = destination.y - currLocation.y;
-  double erroryaw = initialYaw - getYaw();
+// double errorx = destination.x - getCoordinates().x; 
+// double errory = destination.y - getCoordinates().y;
+// double erroryaw = initialYaw - currentYaw;
 
-
-// Serial.print("errorx: ");
 // Serial.println(errorx);
-// Serial.print("errory: ");
 // Serial.println(errory);
-// Serial.print("erroryaw");
 // Serial.println(erroryaw);
 
 
@@ -338,31 +374,20 @@ switch (currentState){
 // TODO: Add tolerance (error will never actually be 0)
 
 while(errorx != 0 || errory != 0 || erroryaw != 0){
-  if(ledStatus == 1){
-    digitalWrite(led,LOW);
-    ledStatus = 0;
-  }
-  else{
-    digitalWrite(led, HIGH);
-    ledStatus = 1;
-  }
-
-  pwmy = int(errorx);
+  int pwmy = int(errorx);
   robot.xMovement(pwmy*5);
 
-  pwmx = int(errory);
+  int pwmx = int(errory);
   robot.yMovement(pwmx*5);
 
-  pwmyaw = int(erroryaw);
+  int pwmyaw = int(erroryaw);
   robot.rotationalMovement(pwmyaw*5);
 
-  currLocation = getCoordinates();
-  errorx = destination.x - currLocation.x;
-  errory = destination.y - currLocation.y;
+  errorx = destination.x - getCoordinates().x;
+  errory = destination.y - getCoordinates().y;
   erroryaw = initialYaw - getYaw();
 
   
-
 
 }
 
@@ -480,6 +505,6 @@ while(errorx != 0 || errory != 0 || erroryaw != 0){
 
 
 
-loopCount += 1;
-}
+
+
 
