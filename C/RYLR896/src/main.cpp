@@ -20,7 +20,7 @@ void radioSetup(){
   Serial2.println("AT+NETWORKID=5");
   Serial.print("Response: ");
   Serial.println(Serial2.readString());
-  Serial2.println("AT+ADDRESS=50");
+  Serial2.println("AT+ADDRESS=123");
   Serial.print("Response: ");
   Serial.println(Serial2.readString());
 
@@ -31,7 +31,7 @@ void radioSetup(){
   // Serial2.readString();
   // Serial2.println("AT+NETWORKID=5");
   // Serial2.readString();
-  // Serial2.println("AT+ADDRESS=50");
+  // Serial2.println("AT+ADDRESS=123");
   // Serial2.readString();
 
 
@@ -66,12 +66,14 @@ int buttonCount = 0;
 //   if(digitalRead(Button) == HIGH){
 //     delay(300);
 //     if(buttonCount % 2 == 0){
-//       Serial2.println("AT+SEND=50,5,START");
+//       Serial2.println("AT+SEND=123,5,START");
+//       // Serial.println(Serial2.readString());
 //       buttonCount += 1;
 //       digitalWrite(led, HIGH);
 //     }
 //     else{
-//       Serial2.println("AT+SEND=50,4,STOP");
+//       Serial2.println("AT+SEND=123,4,STOP");
+//       // Serial.println(Serial2.readString());
 //       buttonCount += 1;
 //       digitalWrite(led, LOW);
 //     }

@@ -51,7 +51,26 @@ VL53L1X sensors[sensorCount];
 motordriver robot;
 
 
-// Course specific stuff
+// Radio --------------------------
+const int TX = 8;
+const int RX = 9;
+
+// Sets radio settings
+void radioSetup(){
+  Serial2.println("AT+RESET");
+  Serial2.readString();
+  Serial2.readString();
+  Serial2.println("AT+BAND=915000000");
+  Serial2.readString();
+  Serial2.println("AT+NETWORKID=5");
+  Serial2.readString();
+  Serial2.println("AT+ADDRESS=123");
+  Serial2.readString();
+}
+
+
+
+// Struct for coordinates
 struct Coordinates{
   double x;
   double y;
@@ -72,7 +91,7 @@ void setup(){
   if (!bno08x.begin_I2C()) {
   //if (!bno08x.begin_UART(&Serial1)) {  // Requires a device with > 300 byte UART buffer!
   //if (!bno08x.begin_SPI(BNO08X_CS, BNO08X_INT)) {
-    Serial.println("Failed to find BNO08x chip");
+    // Serial.println("Failed to find BNO08x chip");
     while (1) { delay(10); }
   }
 
@@ -117,6 +136,15 @@ void setup(){
 
     sensors[i].startContinuous(50);
   }
+
+  // Radio--------------------------------------------
+  Serial2.setTX(TX);
+  Serial2.setRX(RX);
+  // Serial2.setTimeout(1000);
+  Serial2.begin(115200);
+
+  radioSetup();
+
 }
 
 
@@ -267,6 +295,9 @@ int pwmy;
 int pwmx;
 int pwmyaw;
 
+int remoteCount = 0;
+
+
 
 
 void loop(){
@@ -333,7 +364,23 @@ switch (currentState){
 // "P" loop for motor control
 // TODO: Add tolerance (error will never actually be 0)
 
+
 while(errorx != 0 || errory != 0 || erroryaw != 0){
+
+  while(remoteCount % 2 == 0){
+    Serial.println("Waiting for start.");
+    if(Serial2.available() > 0){
+      Serial.println(Serial2.readString());
+      Serial.println("Starting movement");
+      remoteCount += 1;
+    }
+  }
+
+  if(Serial2.available() > 0){
+    Serial.println(Serial2.readString());
+    remoteCount += 1;
+  }
+  
   if(ledStatus == 1){
     digitalWrite(led,LOW);
     ledStatus = 0;
@@ -477,5 +524,8 @@ while(errorx != 0 || errory != 0 || erroryaw != 0){
 
 
 loopCount += 1;
+
+
+
 }
 
