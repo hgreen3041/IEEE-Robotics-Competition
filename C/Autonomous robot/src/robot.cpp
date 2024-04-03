@@ -175,44 +175,46 @@ void quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, euler_t* ypr
 }
 
 
+double xPrev;
+double yPrev;
+double x; 
+double y;
+double halfRobotWidthx = 3.75;
+double halfRobotWidthy = 5.25;
+
+double sensor1;
+double sensor2;
+double sensor3;
+double sensor4;
 
 // Function to retrieve the current location of the robot
 struct Coordinates getCoordinates(){
-
-  Coordinates location;
   // Set the half-width and half-length of the robot. 
-  double halfRobotWidthx = 3.75;
-  double halfRobotWidthy = 5.25;
-
+  
   // Read the sensors
-  double sensor1 = static_cast<double>(sensors[0].read());
+  sensor1 = static_cast<double>(sensors[0].read());
   sensor1 = sensor1/25.4;
-  double sensor2 = static_cast<double>(sensors[1].read());
+  sensor2 = static_cast<double>(sensors[1].read());
   sensor2 = sensor2/25.4;
-  double sensor3 = static_cast<double>(sensors[2].read());
+  sensor3 = static_cast<double>(sensors[2].read());
   sensor3 = sensor3/25.4;
-  double sensor4 = static_cast<double>(sensors[3].read());
+  sensor4 = static_cast<double>(sensors[3].read());
   sensor4 = sensor4/25.4;
 
 
 
   // Calculate coordinates from sensor data
-  double x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(96 - halfRobotWidthx - sensor3);
-  double y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(96 - halfRobotWidthy - sensor2);
-
-
-
+   x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(96 - halfRobotWidthx - sensor3);
+   y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(96 - halfRobotWidthy - sensor2);
 
   // Serial.println("running");
 
 
-  location = {x, y};
-
-  return location; 
+  // calculating coordinates and returning struct
+  return {x,y};
 }
 
-
-// BREAKS THE CODE FOR SOME UNKNOWN REASON
+// get Yaw from IMU
 float getYaw(){
     if (bno08x.wasReset()) {
     Serial.print("sensor was reset ");
@@ -403,6 +405,13 @@ while(errorx != 0 || errory != 0 || erroryaw != 0){
   errorx = destination.x - currLocation.x;
   errory = destination.y - currLocation.y;
   erroryaw = initialYaw - getYaw();
+
+  Serial.print("X-coordinate: ");
+  Serial.println(currLocation.x);
+  Serial.print("Y-coordinate: ");
+  Serial.println(currLocation.y);
+  Serial.print("Yaw: ");
+  Serial.println(getYaw());
 
   
 
