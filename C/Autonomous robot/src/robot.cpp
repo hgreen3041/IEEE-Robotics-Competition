@@ -84,14 +84,23 @@ void setup(){
   digitalWrite(led, HIGH);
 
     Serial.begin(115200);
-    while (!Serial) delay(10);
-
+    while (!Serial) 
+    {
+    digitalWrite(led, HIGH);
+    delay(100);
+    digitalWrite(led, LOW);
+    delay(100);
+    digitalWrite(led, HIGH);
+    delay(100);
+    digitalWrite(led, LOW);
+    delay(500);
+    }
   // BNO08X IMU------------------------------------------------------
   // Try to initialize!
   if (!bno08x.begin_I2C()) {
   //if (!bno08x.begin_UART(&Serial1)) {  // Requires a device with > 300 byte UART buffer!
   //if (!bno08x.begin_SPI(BNO08X_CS, BNO08X_INT)) {
-    // Serial.println("Failed to find BNO08x chip");
+    Serial.println("Failed to find BNO08x chip");
     while (1) { delay(10); }
   }
 
@@ -175,6 +184,7 @@ void quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, euler_t* ypr
 }
 
 
+Coordinates currLocation;
 double xPrev;
 double yPrev;
 double x; 
@@ -190,7 +200,7 @@ double sensor4;
 // Function to retrieve the current location of the robot
 struct Coordinates getCoordinates(){
   // Set the half-width and half-length of the robot. 
-  
+  previousCoordnates = currLocation;
   // Read the sensors
   sensor1 = static_cast<double>(sensors[0].read());
   sensor1 = sensor1/25.4;
@@ -207,7 +217,27 @@ struct Coordinates getCoordinates(){
    x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(96 - halfRobotWidthx - sensor3);
    y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(96 - halfRobotWidthy - sensor2);
 
+  if((sensor1+sensor2+2*halfRobotWidthx> 110 ) || (sensor1+sensor2+2*halfRobotWidthx < 80 ) || (sensor3+sensor4+2*halfRobotWidthy > 110)||(sensor3+sensor4+2*halfRobotWidthy <80))
+    {
+        Serial.print("sensor1+3 ");
+        Serial.println(sensor1+sensor3+2*halfRobotWidthx);
+      Serial.print("SENSOR 2+4 +2*WIDTHY ");
+      Serial.println(sensor3+sensor4+2*halfRobotWidthy);
+      
+    }
+    else{
+
+    }
+
   // Serial.println("running");
+  Serial.print("sensor1 ");
+  Serial.print( sensor1 );
+    Serial.print(" sensor3 ");
+  Serial.println(sensor3);
+  Serial.print("sensor2 ");
+    Serial.print(sensor2);
+      Serial.print(" sensor4 ");
+  Serial.println(sensor4);
 
 
   // calculating coordinates and returning struct
@@ -286,10 +316,11 @@ enum State { stateA, stateD, stateH, stateF, stateB, stateG, stateE, stateC };
 
 
 
-State currentState = stateH; // initialize the starting location of the robot
+State currentState = stateH; // initialize the starting location of the robot 
+Coordinates previousCoordnates = coilH; //innitalize with starting location of coil
 int loopCount = 0;
 float initialYaw; // inital yaw on startup
-Coordinates currLocation;
+
 Coordinates destination;
 int ledStatus = 1;
 
