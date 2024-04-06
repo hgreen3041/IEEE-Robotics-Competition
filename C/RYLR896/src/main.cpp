@@ -9,6 +9,8 @@ const int Button = 2;
 
 const int pin = 5;
 
+int ledStatus = 0;
+
 
 
 void radioSetup(){
@@ -72,19 +74,31 @@ int buttonCount = 0;
 
 void loop() {
   if(digitalRead(Button) == HIGH){
-    delay(200);
-    if(buttonCount % 2 == 0){
-      Serial2.println("AT+SEND=123,5,START");
-      // Serial.println(Serial2.readString());
-      buttonCount += 1;
+    Serial2.println("AT+SEND=123,5,START");
+    if(ledStatus == 0){
       digitalWrite(led, HIGH);
+      ledStatus = 1;
     }
     else{
-      Serial2.println("AT+SEND=123,4,STOP");
-      // Serial.println(Serial2.readString());
-      buttonCount += 1;
       digitalWrite(led, LOW);
+      ledStatus = 0;
     }
+    
+    delay(300);
+    // if(buttonCount % 2 == 0){
+    //   Serial2.println("AT+SEND=123,5,START");
+    //   // Serial.println(Serial2.readString());
+    //   buttonCount += 1;
+    //   digitalWrite(led, HIGH);
+    // }
+    // else{
+    //   Serial2.println("AT+SEND=123,4,STOP");
+    //   // Serial.println(Serial2.readString());
+    //   buttonCount += 1;
+    //   digitalWrite(led, LOW);
+    // }
+
+
 
   }
 

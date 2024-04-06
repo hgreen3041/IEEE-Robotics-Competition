@@ -8,20 +8,22 @@ public:
     const int MAX_PWM = 255;
 
     // Pins for front-left motor
-    const int FL = 15;
-    const int FLDir = 13;
+    // correct
+    const int FL = 18; 
+    const int FLDir = 20;
 
     // Pins for front-right motor
-    const int FR = 14;
-    const int FRDir = 12;
+    // correct
+    const int FR = 19;
+    const int FRDir = 21;
 
     // Pins for back-left motor
-    const int BL = 18;
-    const int BLDir = 20;
+    const int BL = 15;
+    const int BLDir = 13; 
 
     // Pins for back-right motor
-    const int BR = 19;
-    const int BRDir = 21;
+    const int BR = 14;
+    const int BRDir = 12;
 
     // Constructor
     motordriver();

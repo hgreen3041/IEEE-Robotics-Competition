@@ -60,6 +60,13 @@ struct Coordinates{
   double y;
 };
 
+
+void setup1(){
+   Serial1.setRX(RX1);
+  Serial1.setTX(TX1);
+  Serial1.begin(115200);
+}
+
 void setup(){
 
   pinMode(led, OUTPUT);
@@ -81,66 +88,11 @@ void setup(){
   
   // Initialize I2C 
   Wire.begin();
-  Wire.setClock(30000);
+  Wire.setClock(400000); //30000
   // Wire1.setSCL(scl);
   // Wire1.setSDA(sda);
   // Wire1.begin();
   // Wire1.setClock(30000);
-
-
-  // ICM20948------------------------------------------------------
-
-  // myICM.begin(Wire, 0);
-  // bool success = true; // Use success to show if the DMP configuration was successful
-
-  // // Initialize the DMP. initializeDMP is a weak function. You can overwrite it if you want to e.g. to change the sample rate
-  // success &= (myICM.initializeDMP() == ICM_20948_Stat_Ok);
-
-  // // Enable the DMP Game Rotation Vector sensor (Quat6)
-  // success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_GAME_ROTATION_VECTOR) == ICM_20948_Stat_Ok);
-
-  // // Enable additional sensors / features
-  // success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_RAW_GYROSCOPE) == ICM_20948_Stat_Ok);
-  // success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_RAW_ACCELEROMETER) == ICM_20948_Stat_Ok);
-  // success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_MAGNETIC_FIELD_UNCALIBRATED) == ICM_20948_Stat_Ok);
-
-
-  // // Configuring DMP to output data at multiple ODRs:
-  // // DMP is capable of outputting multiple sensor data at different rates to FIFO.
-  // // Setting value can be calculated as follows:
-  // // Value = (DMP running rate / ODR ) - 1
-  // // E.g. For a 5Hz ODR rate when DMP is running at 55Hz, value = (55/5) - 1 = 10.
-  // success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Quat6, 1) == ICM_20948_Stat_Ok);        // Set to 5Hz
-  // success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Accel, 54) == ICM_20948_Stat_Ok);        // Set to 1Hz
-  // success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Gyro, 54) == ICM_20948_Stat_Ok);         // Set to 1Hz
-  // success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Gyro_Calibr, 54) == ICM_20948_Stat_Ok);  // Set to 1Hz
-  // success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Cpass, 54) == ICM_20948_Stat_Ok);        // Set to 1Hz
-  // success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Cpass_Calibr, 54) == ICM_20948_Stat_Ok); // Set to 1Hz
-
-  // // Enable the FIFO
-  // success &= (myICM.enableFIFO() == ICM_20948_Stat_Ok);
-
-  // // Enable the DMP
-  // success &= (myICM.enableDMP() == ICM_20948_Stat_Ok);
-
-  // // Reset DMP
-  // success &= (myICM.resetDMP() == ICM_20948_Stat_Ok);
-
-  // // Reset FIFO
-  // success &= (myICM.resetFIFO() == ICM_20948_Stat_Ok);
-
-  // // Check success
-  // if (success)
-  // {
-  //   Serial.println(F("DMP enabled!"));
-  // }
-  // else
-  // {
-  //   Serial.println(F("Enable DMP failed!"));
-  //   Serial.println(F("Please check that you have uncommented line 29 (#define ICM_20948_USE_DMP) in ICM_20948_C.h..."));
-  //   while (1)
-  //     ; // Do nothing more
-  // }
 
 
   // VL53L1X--------------------------------------------------------
@@ -188,16 +140,16 @@ void setup(){
   // Radio--------------------------------------------
   Serial2.begin(115200);
   Serial2.setTX(TX2);
-  Serial2.setRX(DREQ_PIO0_RX2);
+  Serial2.setRX(RX2);
   Serial2.setTimeout(1000);
   Serial2.begin(115200);
 
   radioSetup();
 
   // UART IMU
-  Serial1.setRX(RX1);
-  Serial1.setTX(TX1);
-  Serial1.begin(115200);
+  // Serial1.setRX(RX1);
+  // Serial1.setTX(TX1);
+  // Serial1.begin(115200);
 
 }
 
@@ -236,68 +188,72 @@ struct Coordinates getCoordinates(){
    x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(96 - halfRobotWidthx - sensor3);
    y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(96 - halfRobotWidthy - sensor2);
 
-  if((sensor1+sensor3+2*halfRobotWidthx > 110 ) || (sensor1+sensor3+2*halfRobotWidthx < 80 ) && (sensor2+sensor4+2*halfRobotWidthy < 110)||(sensor2+sensor4+2*halfRobotWidthy < 80))
-    {
-      Serial.print("sensor 1 + 3 ");
-      Serial.println(sensor1+sensor3+(2*halfRobotWidthx));
-      Serial.print("sensor 2 + 4 ");
-      Serial.println(sensor2+sensor4+(2*halfRobotWidthy));
-      Serial.print("Sensor 1: ");
-      Serial.println(sensor1);
-      Serial.print("Sensor 2: ");
-      Serial.println(sensor2);
-      Serial.print("Sensor 3: ");
-      Serial.println(sensor3);
-      Serial.print("Sensor 4 ");
-      Serial.println(sensor4);
+
+// Readd this for filter blah blah blah
 
 
-      return {prevLocation.x, prevLocation.y};
-      Serial.println("We are driving Blind!!!");
-    }
-    else if((sensor1+sensor3+2*halfRobotWidthx > 110 ) || (sensor1+sensor3+2*halfRobotWidthx < 80 )){
-      Serial.print("sensor 1 + 3 ");
-      Serial.println(sensor1+sensor3+(2*halfRobotWidthx));
-      Serial.print("Sensor 1: ");
-      Serial.println(sensor1);
-      Serial.print("Sensor 3: ");
-      Serial.println(sensor3);
+  // if((sensor1+sensor3+2*halfRobotWidthx > 110 ) || (sensor1+sensor3+2*halfRobotWidthx < 80 ) && (sensor2+sensor4+2*halfRobotWidthy < 110)||(sensor2+sensor4+2*halfRobotWidthy < 80))
+  //   {
+  //     Serial.print("sensor 1 + 3 ");
+  //     Serial.println(sensor1+sensor3+(2*halfRobotWidthx));
+  //     Serial.print("sensor 2 + 4 ");
+  //     Serial.println(sensor2+sensor4+(2*halfRobotWidthy));
+  //     Serial.print("Sensor 1: ");
+  //     Serial.println(sensor1);
+  //     Serial.print("Sensor 2: ");
+  //     Serial.println(sensor2);
+  //     Serial.print("Sensor 3: ");
+  //     Serial.println(sensor3);
+  //     Serial.print("Sensor 4 ");
+  //     Serial.println(sensor4);
 
-      prevLocation.y=y;
-      currLocation={prevLocation.x,y};
-      return {prevLocation.x, y};
-    }
-    else if((sensor2+sensor4+2*halfRobotWidthy < 110)||(sensor2+sensor4+2*halfRobotWidthy < 80)){
-      Serial.print("sensor 2 + 4 ");
-      Serial.println(sensor2+sensor4+(2*halfRobotWidthy));
-      Serial.print("Sensor 2: ");
-      Serial.println(sensor2);
-      Serial.print("Sensor 4 ");
-      Serial.println(sensor4);
 
-      prevLocation.x=x;
-      currLocation={x,prevLocation.y};
-      return{x,prevLocation.y};
+  //     return {prevLocation.x, prevLocation.y};
+  //     Serial.println("We are driving Blind!!!");
+  //   }
+  //   else if((sensor1+sensor3+2*halfRobotWidthx > 110 ) || (sensor1+sensor3+2*halfRobotWidthx < 80 )){
+  //     Serial.print("sensor 1 + 3 ");
+  //     Serial.println(sensor1+sensor3+(2*halfRobotWidthx));
+  //     Serial.print("Sensor 1: ");
+  //     Serial.println(sensor1);
+  //     Serial.print("Sensor 3: ");
+  //     Serial.println(sensor3);
 
-    }
+  //     prevLocation.y=y;
+  //     currLocation={prevLocation.x,y};
+  //     return {prevLocation.x, y};
+  //   }
+  //   else if((sensor2+sensor4+2*halfRobotWidthy < 110)||(sensor2+sensor4+2*halfRobotWidthy < 80)){
+  //     Serial.print("sensor 2 + 4 ");
+  //     Serial.println(sensor2+sensor4+(2*halfRobotWidthy));
+  //     Serial.print("Sensor 2: ");
+  //     Serial.println(sensor2);
+  //     Serial.print("Sensor 4 ");
+  //     Serial.println(sensor4);
 
-    else{
-      prevLocation.x = x;
-      prevLocation.y = y;
-      currLocation = {x,y};
-      return {x,y};
+  //     prevLocation.x=x;
+  //     currLocation={x,prevLocation.y};
+  //     return{x,prevLocation.y};
 
-    }
+  //   }
+
+  //   else{
+  //     prevLocation.x = x;
+  //     prevLocation.y = y;
+  //     currLocation = {x,y};
+  //     return {x,y};
+
+  //   }
 
   // Serial.println("running");
-  Serial.print("sensor1 ");
-  Serial.print( sensor1 );
-    Serial.print(" sensor3 ");
-  Serial.println(sensor3);
-  Serial.print("sensor2 ");
-    Serial.print(sensor2);
-      Serial.print(" sensor4 ");
-  Serial.println(sensor4);
+  // Serial.print("sensor1 ");
+  // Serial.print( sensor1 );
+  //   Serial.print(" sensor3 ");
+  // Serial.println(sensor3);
+  // Serial.print("sensor2 ");
+  //   Serial.print(sensor2);
+  //     Serial.print(" sensor4 ");
+  // Serial.println(sensor4);
 
 
   return {x,y};
@@ -306,92 +262,25 @@ struct Coordinates getCoordinates(){
 // IMPLEMENT
 // get Yaw from IMU
 
-double q1, q2, q3, q0, q2sqr, t0, t1, roll, t2, pitch, t3, t4, yaw;
+String yawString; 
+volatile double yaw = 0;
 
+// Get Yaw from UART connection
 double getYaw(){
-    // Read any DMP data waiting in the FIFO
-  // Note:
-  //    readDMPdataFromFIFO will return ICM_20948_Stat_FIFONoDataAvail if no data is available.
-  //    If data is available, readDMPdataFromFIFO will attempt to read _one_ frame of DMP data.
-  //    readDMPdataFromFIFO will return ICM_20948_Stat_FIFOIncompleteData if a frame was present but was incomplete
-  //    readDMPdataFromFIFO will return ICM_20948_Stat_Ok if a valid frame was read.
-  //    readDMPdataFromFIFO will return ICM_20948_Stat_FIFOMoreDataAvail if a valid frame was read _and_ the FIFO contains more (unread) data.
-  icm_20948_DMP_data_t data;
-  myICM.readDMPdataFromFIFO(&data);
-
-  if ((myICM.status == ICM_20948_Stat_Ok) || (myICM.status == ICM_20948_Stat_FIFOMoreDataAvail)) // Was valid data available?
-  {
-    //Serial.print(F("Received data! Header: 0x")); // Print the header in HEX so we can see what data is arriving in the FIFO
-    //if ( data.header < 0x1000) Serial.print( "0" ); // Pad the zeros
-    //if ( data.header < 0x100) Serial.print( "0" );
-    //if ( data.header < 0x10) Serial.print( "0" );
-    //Serial.println( data.header, HEX );
-
-    if ((data.header & DMP_header_bitmap_Quat6) > 0) // We have asked for GRV data so we should receive Quat6
-    {
-      // Q0 value is computed from this equation: Q0^2 + Q1^2 + Q2^2 + Q3^2 = 1.
-      // In case of drift, the sum will not add to 1, therefore, quaternion data need to be corrected with right bias values.
-      // The quaternion data is scaled by 2^30.
-
-      //Serial.printf("Quat6 data is: Q1:%ld Q2:%ld Q3:%ld\r\n", data.Quat6.Data.Q1, data.Quat6.Data.Q2, data.Quat6.Data.Q3);
-
-      // Scale to +/- 1
-      q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0; // Convert to double. Divide by 2^30
-      q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0; // Convert to double. Divide by 2^30
-      q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0; // Convert to double. Divide by 2^30
-
-      /*
-      Serial.print(F("Q1:"));
-      Serial.print(q1, 3);
-      Serial.print(F(" Q2:"));
-      Serial.print(q2, 3);
-      Serial.print(F(" Q3:"));
-      Serial.println(q3, 3);
-*/
-
-      // Convert the quaternions to Euler angles (roll, pitch, yaw)
-      // https://en.wikipedia.org/w/index.php?title=Conversion_between_quaternions_and_Euler_angles&section=8#Source_code_2
-
-      q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
-
-      q2sqr = q2 * q2;
-
-      // roll (x-axis rotation)
-      t0 = +2.0 * (q0 * q1 + q2 * q3);
-      t1 = +1.0 - 2.0 * (q1 * q1 + q2sqr);
-      roll = atan2(t0, t1) * 180.0 / PI;
-
-      // pitch (y-axis rotation)
-      t2 = +2.0 * (q0 * q2 - q3 * q1);
-      t2 = t2 > 1.0 ? 1.0 : t2;
-      t2 = t2 < -1.0 ? -1.0 : t2;
-      pitch = asin(t2) * 180.0 / PI;
-
-      // yaw (z-axis rotation)
-      t3 = +2.0 * (q0 * q3 + q1 * q2);
-      t4 = +1.0 - 2.0 * (q2sqr + q3 * q3);
-      yaw = atan2(t3, t4) * 180.0 / PI;
-
-      // Serial.print(F("Roll:"));
-      // Serial.print(roll, 1);
-      // Serial.print(F(" Pitch:"));
-      // Serial.print(pitch, 1);
-      // Serial.print(F(" Yaw:"));
-      // Serial.println(yaw, 1);
-
-      
-    }
+ 
+  yawString = Serial1.readStringUntil('\n');
+  yaw = yawString.toFloat();
+  
+  if(abs(yaw) > 180){
+    yawString = Serial1.readStringUntil('\n');
+    yaw = yawString.toFloat();
   }
-
-  if (myICM.status != ICM_20948_Stat_FIFOMoreDataAvail) // If more data is available then we should read it right away - and not delay
-  {
-    delay(10);
+  if(abs(yaw) > 180){
+    yawString = Serial1.readStringUntil('\n');
+    yaw = yawString.toFloat();
   }
 
 
-  // if(abs(yaw) == 90.0){
-  //   return 0;
-  // }
   return yaw;
 }
 
@@ -455,6 +344,10 @@ float kx = 8;//14
 float ky = 2;//3
 float ktheta = 1;
 
+void loop1(){
+  yaw = getYaw();
+}
+
 void loop(){
   
 // TODO: Need to implement functions for getting new sensor data if going to use switch statement
@@ -499,7 +392,8 @@ switch (currentState){
   currLocation = getCoordinates();
   double errorx = destination.x - currLocation.x;
   double errory = destination.y - currLocation.y;
-  double erroryaw = initialYaw - getYaw();
+  // PAUSE CORE?
+  double erroryaw = initialYaw - yaw;
 
 //   //  while(abs(errory) >= 3){
 //   //   robot.yMovement(ky*errory);
@@ -528,9 +422,9 @@ switch (currentState){
 // // TODO: Add tolerance (error will never actually be 0)
 
 
-// // while(abs(errorx) > 1.0 || abs(errory) > 1.0 || abs(erroryaw) > 1.0){
+while(abs(errorx) > 3.0 || abs(errory) > 3.0 || abs(erroryaw) > 3.0){
 
-while(true){     
+// while(true){     
   while(remoteCount % 2 == 0){
     getCoordinates();
     Serial.print("Waiting for start.\r");
@@ -564,14 +458,15 @@ while(true){
     ledStatus = 1;
   }
 
-float kx = 0;
-float ky = 0;
-float kyaw = 1;
+float kx = 15;
+float ky = 15;
+float kyaw = 0;
 
-  pwm1 = int((kx*errorx - ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
-  pwm2 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
-  pwm3 = int((kx*errorx + ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
-  pwm4 = int((kx*errorx - ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
+  // pwm1 = int((kx*errorx - ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
+  // pwm2 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
+  // pwm3 = int((kx*errorx + ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
+  // pwm4 = int((kx*errorx - ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
+  
 
 
   Serial.print("PWM1: ");
@@ -595,20 +490,18 @@ float kyaw = 1;
   currLocation = getCoordinates();
   errorx = destination.x - currLocation.x;
   errory = destination.y - currLocation.y;
-  erroryaw = initialYaw - getYaw();
+  // PAUSE CORE?
+  erroryaw = initialYaw - yaw;
 
   Serial.print("ErrorX: ");
-  Serial.println(errory);
+  Serial.println(errorx);
   Serial.print("ErrorY: ");
   Serial.println(errory);
   Serial.print("ErrorYaw: ");
   Serial.println(erroryaw);
-  Serial.print("X-coordinate: ");
-  Serial.println(currLocation.x);
-  Serial.print("Y-coordinate: ");
-  Serial.println(currLocation.y);
-  Serial.print("Yaw: ");
-  Serial.println(Serial1.r);
+  // Serial.print("Yaw: ");
+  // Serial.println(yaw);
+  
 
   
 

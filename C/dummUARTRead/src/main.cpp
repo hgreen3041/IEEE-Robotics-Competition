@@ -16,10 +16,6 @@ void setup() {
 
 void loop() {
 
-  while(!Serial){}
-  delay(10);
-
-
   digitalWrite(led, HIGH);
   String yaw = Serial1.readStringUntil('\n');
   Serial.println(yaw);
