@@ -54,9 +54,15 @@ ICM_20948_I2C myICM; // Otherwise create an ICM_20948_I2C object
 #define TX 16
 #define RX 17
 
+#define led 25
+
 
 void setup()
 {
+  pinMode(led, OUTPUT);
+  digitalWrite(led, HIGH);
+  delay(25);
+  digitalWrite(led, LOW);
   Serial1.setTX(TX);
   Serial1.setRX(RX);
 
@@ -144,6 +150,7 @@ void setup()
 
 
 }
+
 
 void loop()
 {
