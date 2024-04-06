@@ -460,13 +460,17 @@ while(abs(errorx) > 3.0 || abs(errory) > 3.0 || abs(erroryaw) > 3.0){
 
 float kx = 15;
 float ky = 15;
-float kyaw = 0;
+float kyaw = 2;
 
   // pwm1 = int((kx*errorx - ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
   // pwm2 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
   // pwm3 = int((kx*errorx + ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
   // pwm4 = int((kx*errorx - ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
-  
+
+  pwm1 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
+  pwm2 = int((-kx*errorx + ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
+  pwm3 = int((-kx*errorx + ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
+  pwm4 = int((+kx*errorx + ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255);
 
 
   Serial.print("PWM1: ");

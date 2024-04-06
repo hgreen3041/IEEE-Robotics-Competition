@@ -92,7 +92,7 @@ void moveBackward(int pwm){
 
 }
 
-void moveRight(int pwm){
+void moveLeft(int pwm){
     /*
     Moves the robot right at the given speed
 
@@ -115,7 +115,7 @@ void moveRight(int pwm){
     digitalWrite(BRDir, LOW); 
 }
 
-void moveLeft(int pwm){
+void moveRight(int pwm){
     /*
     Moves the robot left at the given speed
 
@@ -263,9 +263,9 @@ void loop(){
     // delay(1000);
     // moveLeft(200);
     // delay(1000);
-    // moveRight(255);
+    moveRight(255);
     // delay(1000);
-    move45(255);
+    // move45(255);
     // delay(1000);
     // move225(255);
     delay(1000);
