@@ -298,14 +298,25 @@ double getYaw(){
 // additions/subtractions are for the offset of the robot
 // x-coil distance to center: 4.53
 // y-coil distance to center: 5.9
-const Coordinates coilA = {32.0, 0.0 + 8.0};
-const Coordinates coilB = {64.0, 0.0 + 8.0};
-const Coordinates coilC = {96.0 - 6.5, 32.0};
-const Coordinates coilD = {96.0 - 6.5, 64.0};
-const Coordinates coilE = {64.0, 96.0 - 8.0};
-const Coordinates coilF = {32.0, 96.0 - 8.0};
-const Coordinates coilG = {0.0 + 6.5, 64.0};
-const Coordinates coilH = {0.0 + 6.5, 32.0};
+// const Coordinates coilA = {32.0, 0.0 + 8.0};
+// const Coordinates coilB = {64.0, 0.0 + 8.0};
+// const Coordinates coilC = {96.0 - 6.5, 32.0};
+// const Coordinates coilD = {96.0 - 6.5, 64.0};
+// const Coordinates coilE = {64.0, 96.0 - 8.0};
+// const Coordinates coilF = {32.0, 96.0 - 8.0};
+// const Coordinates coilG = {0.0 + 6.5, 64.0};
+// const Coordinates coilH = {0.0 + 6.5, 32.0};
+
+const Coordinates coilA = {24.0, 0.0 + 6.5};
+const Coordinates coilB = {72.0, 0.0 + 6.5};
+const Coordinates coilC = {96.0 - 5, 24.0};
+const Coordinates coilD = {96.0 - 5, 72.0};
+const Coordinates coilE = {72.0, 96.0 - 6.5};
+const Coordinates coilF = {24.0, 96.0 - 6.5};
+const Coordinates coilG = {0.0 + 5, 72.0};
+const Coordinates coilH = {0.0 + 5, 24.0};
+
+
 
 // Create states (last known coil)
 enum State { stateA, stateD, stateH, stateF, stateB, stateG, stateE, stateC }; 
@@ -354,11 +365,21 @@ void loop1(){
   yaw = getYaw();
 }
 
+int counter = 0;
 void loop(){
   
 // TODO: Need to implement functions for getting new sensor data if going to use switch statement
 
 // OPTION 1 -----------------------------------------------------------------------------------------------
+
+if(counter == 0) {
+  robot.moveForward(255);
+  delay(200);
+  robot.move45(2500);
+  robot.stopMotors();
+}
+
+
 
 switch (currentState){
   case stateA: 
@@ -436,7 +457,7 @@ switch (currentState){
 // // TODO: Add tolerance (error will never actually be 0)
 
 
-while(abs(errorx) > 5.0 || abs(errory) > 5.0 || abs(erroryaw) > 2.0){
+while(abs(errorx) > 6.5 || abs(errory) > 6.5 || abs(erroryaw) > 2.0){
 
   while(remoteCount % 2 == 0){
     robot.stopMotors();
@@ -475,9 +496,11 @@ while(abs(errorx) > 5.0 || abs(errory) > 5.0 || abs(erroryaw) > 2.0){
 // float ky = 8000;
 // float kyaw = 200;
 
-float kx = 11.5;
-float ky = 13;
-float kyaw = 5.7;
+// 11.5, 11.5, 5.7
+
+float kx = 17;
+float ky = 17;
+float kyaw = 5.9;
 
 
   pwm1 = int((kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 

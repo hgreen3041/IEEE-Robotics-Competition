@@ -217,13 +217,13 @@ void loop()
       double t4 = +1.0 - 2.0 * (q2sqr + q3 * q3);
       double yaw = atan2(t3, t4) * 180.0 / PI;
 
-      // Serial.print(F("Roll:"));
-      // Serial.print(roll, 1);
-      // Serial.print(F(" Pitch:"));
-      // Serial.print(pitch, 1);
-      // Serial.print(F(" Yaw:"));
-      // Serial.println(yaw, 1);
-      // Serial1.println(String(yaw, 1));
+      Serial.print(F("Roll:"));
+      Serial.print(roll, 1);
+      Serial.print(F(" Pitch:"));
+      Serial.print(pitch, 1);
+      Serial.print(F(" Yaw:"));
+      Serial.println(yaw, 1);
+      Serial1.println(String(yaw, 1));
     }
   }
 
