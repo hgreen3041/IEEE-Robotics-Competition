@@ -62,7 +62,7 @@ void setup()
 
   Serial1.begin(115200);
 
-  // Serial.begin(115200);    //usb serial got rid of no need to see right now.
+  Serial.begin(115200);    //usb serial got rid of no need to see right now.
   // while(!Serial) delay(10);
   
   
@@ -216,7 +216,7 @@ void loop()
       // Serial.print(pitch, 1);
       // Serial.print(F(" Yaw:"));
       // Serial.println(yaw, 1);
-      Serial1.println(String(yaw, 1));
+      // Serial1.println(String(yaw, 1));
     }
   }
 

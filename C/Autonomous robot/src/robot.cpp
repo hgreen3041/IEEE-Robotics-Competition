@@ -72,12 +72,12 @@ void setup1(){
 
 void setup(){
 
-  pinMode(imuRestart, OUTPUT);
+  // pinMode(imuRestart, OUTPUT);
   pinMode(led, OUTPUT);
-  digitalWrite(led, HIGH);
-  digitalWrite(imuRestart, LOW);
-  delay(100);
-  digitalWrite(imuRestart, HIGH);
+  // digitalWrite(led, HIGH);
+  // digitalWrite(imuRestart, LOW);
+  // delay(100);
+  // pinMode(imuRestart, INPUT);
 
     // Serial.begin(115200);
     // while (!Serial) 
@@ -279,15 +279,15 @@ double getYaw(){
   yaw = yawString.toFloat();
   
 
-  // PUT BACK POSSIBLY
-  if(abs(yaw) > 180){
-    yawString = Serial1.readStringUntil('\n');
-    yaw = yawString.toFloat();
-  }
-  if(abs(yaw) > 180){
-    yawString = Serial1.readStringUntil('\n');
-    yaw = yawString.toFloat();
-  }
+  // // PUT BACK POSSIBLY
+  // if(abs(yaw) > 180){
+  //   yawString = Serial1.readStringUntil('\n');
+  //   yaw = yawString.toFloat();
+  // }
+  // if(abs(yaw) > 180){
+  //   yawString = Serial1.readStringUntil('\n');
+  //   yaw = yawString.toFloat();
+  // }
 
 
   return yaw;
@@ -333,8 +333,8 @@ enum State { stateA, stateD, stateH, stateF, stateB, stateG, stateE, stateC };
 //   return stateA;
 // }
 
-State currentState = stateB; // initialize the starting location of the robot 
-Coordinates previousCoordnates = coilB; //innitalize with starting location of coil
+State currentState = stateG; // initialize the starting location of the robot 
+Coordinates previousCoordnates = coilG; //innitalize with starting location of coil
 int loopCount = 0;
 float initialYaw = 0.0; // inital yaw on startup
 
@@ -441,7 +441,10 @@ while(abs(errorx) > 5.0 || abs(errory) > 5.0 || abs(erroryaw) > 2.0){
   while(remoteCount % 2 == 0){
     robot.stopMotors();
     getCoordinates();
+    Serial.print("Yaw: ");
+    Serial.println(yaw);
     Serial.println("Waiting for start.");
+    digitalWrite(led, HIGH);
   
     
     if(Serial2.available() > 0){
@@ -473,7 +476,7 @@ while(abs(errorx) > 5.0 || abs(errory) > 5.0 || abs(erroryaw) > 2.0){
 // float kyaw = 200;
 
 float kx = 11.5;
-float ky = 11.5;
+float ky = 13;
 float kyaw = 5.7;
 
 
@@ -512,14 +515,14 @@ float kyaw = 5.7;
   // PAUSE CORE?
   erroryaw = initialYaw - yaw;
 
-  // Serial.print("ErrorX: ");
-  // Serial.println(errorx);
-  // Serial.print("ErrorY: ");
-  // Serial.println(errory);
-  // Serial.print("ErrorYaw: ");
-  // Serial.println(erroryaw);
-  // Serial.print("Yaw: ");
-  // Serial.println(yaw);
+  Serial.print("ErrorX: ");
+  Serial.println(errorx);
+  Serial.print("ErrorY: ");
+  Serial.println(errory);
+  Serial.print("ErrorYaw: ");
+  Serial.println(erroryaw);
+  Serial.print("Yaw: ");
+  Serial.println(yaw);
   
 
   
