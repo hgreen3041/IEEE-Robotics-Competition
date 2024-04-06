@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Wire.h>
 // This demo explores two reports (SH2_ARVR_STABILIZED_RV and SH2_GYRO_INTEGRATED_RV) both can be used to give 
 // quartenion and euler (yaw, pitch roll) angles.  Toggle the FAST_MODE define to see other report.  
 // Note sensorValue.status gives calibration accuracy (which improves over time)
@@ -6,6 +7,8 @@
 
 
 #define BNO08X_RESET -1
+
+const int led = 25;
 
 struct euler_t {
   float yaw;
@@ -34,8 +37,12 @@ void setReports(sh2_SensorId_t reportType, long report_interval) {
 
 void setup(void) {
 
+  pinMode(led, OUTPUT);
+  digitalWrite(led, HIGH);
+
   Serial.begin(115200);
   while (!Serial) delay(10);     // will pause Zero, Leonardo, etc until serial console opens
+  Wire.begin();
 
 
   // Try to initialize!
@@ -79,6 +86,7 @@ void quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, euler_t* ypr
 }
 
 void loop() {
+
 
   if (bno08x.wasReset()) {
     Serial.print("sensor was reset ");

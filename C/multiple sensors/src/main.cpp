@@ -11,21 +11,41 @@ well.
 
 #include <Wire.h>
 #include <VL53L1X.h>
+#include <Arduino.h>
 
 // The number of sensors in your system.
 const uint8_t sensorCount = 4;
 
 // The Arduino pin connected to the XSHUT pin of each sensor.
-const uint8_t xshutPins[sensorCount] = { 6,22,17,16};
+const uint8_t xshutPins[sensorCount] = { 11,22,16,17};
 
 VL53L1X sensors[sensorCount];
+
+void redoInit(int sensor){
+      sensors[sensor].setTimeout(1500);
+    if (!sensors[sensor].init())
+    {
+      Serial.print("Failed to detect and initialize sensor ");
+      Serial.println(sensor);
+      ;
+    }
+
+    // Each sensor must have its address changed to a unique value other than
+    // the default of 0x29 (except for the last one, which could be left at
+    // the default). To make it simple, we'll just count up from 0x2A.
+    sensors[sensor].setAddress(0x2A + sensor);
+
+    sensors[sensor].startContinuous(50);
+}
+
 
 void setup()
 {
   while (!Serial) {}
   Serial.begin(115200);
+
   Wire.begin();
-  Wire.setClock(400000); // use 400 kHz I2C
+  Wire.setClock(100000); // use 400 kHz I2C
 
   // Disable/reset all sensors by driving their XSHUT pins low.
   for (uint8_t i = 0; i < sensorCount; i++)
@@ -65,7 +85,10 @@ void loop()
   for (uint8_t i = 0; i < sensorCount; i++)
   {
     Serial.print(sensors[i].read());
-    if (sensors[i].timeoutOccurred()) { Serial.print(" TIMEOUT"); }
+    if (sensors[i].timeoutOccurred()) { Serial.print(" TIMEOUT");
+      // redoInit(i);
+    
+     }
     Serial.print('\t');
   }
   Serial.println();

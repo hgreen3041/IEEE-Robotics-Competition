@@ -258,23 +258,22 @@ void loop(){
 
     // Test all movement at full speed
     moveForward(255);
-    // move135(255);
-    delay(5000);
-    // moveBackward(255);
-    // delay(5000);
-    // moveLeft(255);
-    // delay(5000);
-    // moveRight(255);
-    // delay(5000);
-    // move45(255);
-    // delay(5000);
-    // move225(255);
-    // delay(5000);
-    // move135(255);
-    // delay(5000);
-    // move315(255);
-    // delay(5000);
-    // stopMotors();
+    delay(1000);
+    moveBackward(255);
+    delay(1000);
+    moveLeft(200);
+    delay(1000);
+    moveRight(255);
+    delay(1000);
+    move45(255);
+    delay(1000);
+    move225(255);
+    delay(1000);
+    move135(255);
+    delay(1000);
+    move315(255);
+    delay(1000);
+    stopMotors();
     delay(2000);
 
 }

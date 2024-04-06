@@ -30,6 +30,10 @@ public:
     ~motordriver();
 
     // Function declarations
+    void M1(int pwm);
+    void M2(int pwm);
+    void M3(int pwm);
+    void M4(int pwm);
     void yMovement(int pwm);
     void xMovement(int pwm);
     void rotationalMovement(int pwm);

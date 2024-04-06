@@ -38,6 +38,66 @@ motordriver :: motordriver(){
     None
     */
 
+
+void motordriver :: M1(int pwm){
+    if(pwm >= 0 ){
+    analogWrite(FL, pwm);
+    digitalWrite(FLDir, LOW);
+    }
+
+    else{
+        pwm = abs(pwm);
+        analogWrite(FL, pwm);
+        digitalWrite(FLDir, HIGH);
+
+
+    }
+}
+
+void motordriver :: M2(int pwm){
+    if(pwm >= 0 ){
+    analogWrite(FR, pwm);
+    digitalWrite(FRDir, LOW);
+    }
+
+    else{
+        pwm = abs(pwm);
+        analogWrite(FR, pwm);
+        digitalWrite(FRDir, HIGH);
+
+
+    }
+}
+
+void motordriver :: M3(int pwm){
+    if(pwm >= 0 ){
+    analogWrite(BL, pwm);
+    digitalWrite(BLDir, LOW);
+    }
+
+    else{
+        pwm = abs(pwm);
+        analogWrite(BL, pwm);
+        digitalWrite(BLDir, HIGH);
+
+
+    }
+}
+
+void motordriver :: M4(int pwm){
+    if(pwm >= 0 ){
+    analogWrite(BR, pwm);
+    digitalWrite(BRDir, LOW);
+    }
+
+    else{
+        pwm = abs(pwm);
+        analogWrite(BR, pwm);
+        digitalWrite(BRDir, HIGH);
+
+
+    }
+}
 void motordriver :: yMovement(int pwm){
     if(pwm >= 0 ){
         analogWrite(FL, pwm);
