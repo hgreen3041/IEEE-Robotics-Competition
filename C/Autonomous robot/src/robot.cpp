@@ -20,12 +20,10 @@ const int RX1 = 1;
 // arduino::UART Serial2(TX1, RX1);
 // arduino::MbedI2C Wire1(sda, scl);
 
-// ICM20948 IMU
+// ICM20948 - pico IMU
 
-// On the SparkFun 9DoF IMU breakout the default is 1, and when the ADR jumper is closed the value becomes 0
-#define AD0_VAL 1
-
-ICM_20948_I2C myICM; // Otherwise create an ICM_20948_I2C object
+// IMU restart
+#define imuRestart 28
 
 //VL53L1X Sensors
 const int sensorCount = 4;
@@ -65,26 +63,35 @@ void setup1(){
    Serial1.setRX(RX1);
   Serial1.setTX(TX1);
   Serial1.begin(115200);
+
+  Serial1.println("RESTART");
+
+
 }
+
 
 void setup(){
 
+  pinMode(imuRestart, OUTPUT);
   pinMode(led, OUTPUT);
   digitalWrite(led, HIGH);
+  digitalWrite(imuRestart, LOW);
+  delay(100);
+  digitalWrite(imuRestart, HIGH);
 
-    Serial.begin(115200);
-    while (!Serial) 
-    {
-    digitalWrite(led, HIGH);
-    delay(100);
-    digitalWrite(led, LOW);
-    delay(100);
-    digitalWrite(led, HIGH);
-    delay(100);
-    digitalWrite(led, LOW);
-    delay(500);
-    }
-    delay(10);
+    // Serial.begin(115200);
+    // while (!Serial) 
+    // {
+    // digitalWrite(led, HIGH);
+    // delay(100);
+    // digitalWrite(led, LOW);
+    // delay(100);
+    // digitalWrite(led, HIGH);
+    // delay(100);
+    // digitalWrite(led, LOW);
+    // delay(500);
+    // }
+    // delay(10);
   
   // Initialize I2C 
   Wire.begin();
@@ -245,15 +252,15 @@ struct Coordinates getCoordinates(){
 
   //   }
 
-  // Serial.println("running");
-  // Serial.print("sensor1 ");
-  // Serial.print( sensor1 );
-  //   Serial.print(" sensor3 ");
-  // Serial.println(sensor3);
-  // Serial.print("sensor2 ");
-  //   Serial.print(sensor2);
-  //     Serial.print(" sensor4 ");
-  // Serial.println(sensor4);
+  Serial.println("running");
+  Serial.print("sensor1 ");
+  Serial.print( sensor1 );
+    Serial.print(" sensor3 ");
+  Serial.println(sensor3);
+  Serial.print("sensor2 ");
+    Serial.print(sensor2);
+      Serial.print(" sensor4 ");
+  Serial.println(sensor4);
 
 
   return {x,y};
@@ -271,6 +278,8 @@ double getYaw(){
   yawString = Serial1.readStringUntil('\n');
   yaw = yawString.toFloat();
   
+
+  // PUT BACK POSSIBLY
   if(abs(yaw) > 180){
     yawString = Serial1.readStringUntil('\n');
     yaw = yawString.toFloat();
@@ -340,9 +349,6 @@ int pwm4;
 int remoteCount = 0;
 
 
-float kx = 8;//14
-float ky = 2;//3
-float ktheta = 1;
 
 void loop1(){
   yaw = getYaw();
@@ -358,34 +364,42 @@ switch (currentState){
   case stateA: 
     destination = coilD;
     currentState = stateD;
+    Serial.println("Reached coil A");
     break;
   case stateB:
     destination = coilG;
     currentState = stateG;
+    Serial.println("Reached coil B");
     break;
   case stateC:
     destination = coilA;
     currentState = stateA;
+    Serial.println("Reached coil C");
     break;
   case stateD:
     destination = coilH;
     currentState = stateH;
+    Serial.println("Reached coil D");
     break;
   case stateE:
     destination = coilC;
     currentState = stateC;
+    Serial.println("Reached coil E");
     break;
   case stateF:
     destination = coilB;
     currentState = stateB;
+    Serial.println("Reached coil F");
     break;
   case stateG:
     destination = coilE;
     currentState = stateE;
+    Serial.println("Reached coil G");
     break;
   case stateH:
     destination = coilF;
     currentState = stateF;
+    Serial.println("Reached coil H");
     break;
 }
 
@@ -422,17 +436,13 @@ switch (currentState){
 // // TODO: Add tolerance (error will never actually be 0)
 
 
-while(abs(errorx) > 3.0 || abs(errory) > 3.0 || abs(erroryaw) > 3.0){
+while(abs(errorx) > 5.0 || abs(errory) > 5.0 || abs(erroryaw) > 2.0){
 
-// while(true){     
   while(remoteCount % 2 == 0){
-    getCoordinates();
-    Serial.print("Waiting for start.\r");
-    // Serial.print("X-Coordinate: ");
-    // Serial.println(currLocation.x);
-    // Serial.print("Y-coordinate: ");
-    // Serial.println(currLocation.y);
     robot.stopMotors();
+    getCoordinates();
+    Serial.println("Waiting for start.");
+  
     
     if(Serial2.available() > 0){
       remoteCount += 1;
@@ -458,19 +468,24 @@ while(abs(errorx) > 3.0 || abs(errory) > 3.0 || abs(erroryaw) > 3.0){
     ledStatus = 1;
   }
 
-float kx = 15;
-float ky = 15;
-float kyaw = 2;
+// float kx = 8000;
+// float ky = 8000;
+// float kyaw = 200;
 
-  // pwm1 = int((kx*errorx - ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
-  // pwm2 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
-  // pwm3 = int((kx*errorx + ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
-  // pwm4 = int((kx*errorx - ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
+float kx = 11.5;
+float ky = 11.5;
+float kyaw = 5.7;
 
-  pwm1 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
-  pwm2 = int((-kx*errorx + ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
-  pwm3 = int((-kx*errorx + ky*errory + kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255); 
-  pwm4 = int((+kx*errorx + ky*errory - kyaw*erroryaw)/(96*(kx + ky) + 180*(kyaw))*255);
+
+  pwm1 = int((kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 
+  pwm2 = int((-kx*errorx + ky*errory + kyaw*erroryaw)/(500)*255); 
+  pwm3 = int((-kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 
+  pwm4 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(500)*255); 
+
+  // pwm1 = int(((kx*errorx + ky*errory + kyaw*erroryaw)/500)*255); 
+  // pwm2 = int(((-kx*errorx + ky*errory - kyaw*erroryaw)/500)*255); 
+  // pwm3 = int(((-kx*errorx + ky*errory + kyaw*erroryaw)/500)*255); 
+  // pwm4 = int(((+kx*errorx + ky*errory - kyaw*erroryaw)/500)*255);
 
 
   Serial.print("PWM1: ");
@@ -497,12 +512,12 @@ float kyaw = 2;
   // PAUSE CORE?
   erroryaw = initialYaw - yaw;
 
-  Serial.print("ErrorX: ");
-  Serial.println(errorx);
-  Serial.print("ErrorY: ");
-  Serial.println(errory);
-  Serial.print("ErrorYaw: ");
-  Serial.println(erroryaw);
+  // Serial.print("ErrorX: ");
+  // Serial.println(errorx);
+  // Serial.print("ErrorY: ");
+  // Serial.println(errory);
+  // Serial.print("ErrorYaw: ");
+  // Serial.println(erroryaw);
   // Serial.print("Yaw: ");
   // Serial.println(yaw);
   
