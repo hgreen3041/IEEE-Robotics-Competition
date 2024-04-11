@@ -74,12 +74,8 @@ void setup(){
 
   // pinMode(imuRestart, OUTPUT);
   pinMode(led, OUTPUT);
-  // digitalWrite(led, HIGH);
-  // digitalWrite(imuRestart, LOW);
-  // delay(100);
-  // pinMode(imuRestart, INPUT);
-
-    // Serial.begin(115200);
+  
+    Serial.begin(115200);
     // while (!Serial) 
     // {
     // digitalWrite(led, HIGH);
@@ -95,7 +91,7 @@ void setup(){
   
   // Initialize I2C 
   Wire.begin();
-  Wire.setClock(400000); //30000
+  Wire.setClock(30000); //30000
   // Wire1.setSCL(scl);
   // Wire1.setSDA(sda);
   // Wire1.begin();
@@ -298,14 +294,14 @@ double getYaw(){
 // additions/subtractions are for the offset of the robot
 // x-coil distance to center: 4.53
 // y-coil distance to center: 5.9
-const Coordinates coilA = {32.0, 0.0 + 8.0};
-const Coordinates coilB = {64.0, 0.0 + 8.0};
-const Coordinates coilC = {96.0 - 6.5, 32.0};
-const Coordinates coilD = {96.0 - 6.5, 64.0};
-const Coordinates coilE = {64.0, 96.0 - 8.0};
-const Coordinates coilF = {32.0, 96.0 - 8.0};
-const Coordinates coilG = {0.0 + 6.5, 64.0};
-const Coordinates coilH = {0.0 + 6.5, 32.0};
+const Coordinates coilA = {24.0, 0.0 + 6.0};
+const Coordinates coilB = {72.0, 0.0 + 6.0};
+const Coordinates coilC = {96.0 - 4.5, 24.0};
+const Coordinates coilD = {96.0 - 4.5, 72.0};
+const Coordinates coilE = {72.0, 96.0 - 6.0};
+const Coordinates coilF = {32.0, 96.0 - 6.0};
+const Coordinates coilG = {0.0 + 4.5, 72.0};
+const Coordinates coilH = {0.0 + 4.5, 24.0};
 
 // Create states (last known coil)
 enum State { stateA, stateD, stateH, stateF, stateB, stateG, stateE, stateC }; 
@@ -333,8 +329,8 @@ enum State { stateA, stateD, stateH, stateF, stateB, stateG, stateE, stateC };
 //   return stateA;
 // }
 
-State currentState = stateG; // initialize the starting location of the robot 
-Coordinates previousCoordnates = coilG; //innitalize with starting location of coil
+State currentState = stateB; // initialize the starting location of the robot 
+Coordinates previousCoordinates = coilB; //innitalize with starting location of coil
 int loopCount = 0;
 float initialYaw = 0.0; // inital yaw on startup
 
@@ -436,7 +432,7 @@ switch (currentState){
 // // TODO: Add tolerance (error will never actually be 0)
 
 
-while(abs(errorx) > 5.0 || abs(errory) > 5.0 || abs(erroryaw) > 2.0){
+while(abs(errorx) > 5.0 || abs(errory) > 5.0){
 
   while(remoteCount % 2 == 0){
     robot.stopMotors();
@@ -471,12 +467,8 @@ while(abs(errorx) > 5.0 || abs(errory) > 5.0 || abs(erroryaw) > 2.0){
     ledStatus = 1;
   }
 
-// float kx = 8000;
-// float ky = 8000;
-// float kyaw = 200;
-
-float kx = 11.5;
-float ky = 13;
+float kx = 8.75;
+float ky = 8.5;
 float kyaw = 5.7;
 
 
@@ -491,14 +483,14 @@ float kyaw = 5.7;
   // pwm4 = int(((+kx*errorx + ky*errory - kyaw*erroryaw)/500)*255);
 
 
-  Serial.print("PWM1: ");
-  Serial.println(pwm1);
-  Serial.print("PWM2: ");
-  Serial.println(pwm2);
-  Serial.print("PWM3: ");
-  Serial.println(pwm3);
-  Serial.print("PWM4: ");
-  Serial.println(pwm4);
+  // Serial.print("PWM1: ");
+  // Serial.println(pwm1);
+  // Serial.print("PWM2: ");
+  // Serial.println(pwm2);
+  // Serial.print("PWM3: ");
+  // Serial.println(pwm3);
+  // Serial.print("PWM4: ");
+  // Serial.println(pwm4);
 
   
   robot.M1(pwm1);
@@ -515,6 +507,15 @@ float kyaw = 5.7;
   // PAUSE CORE?
   erroryaw = initialYaw - yaw;
 
+
+  Serial.print("X-Coordinate: ");
+  Serial.println(currLocation.x);
+  Serial.print("Y-Coordinate: ");
+  Serial.println(currLocation.y);
+  Serial.print("Destination X: ");
+  Serial.println(destination.x);
+  Serial.print("Destination Y: ");
+  Serial.println(destination.y);
   Serial.print("ErrorX: ");
   Serial.println(errorx);
   Serial.print("ErrorY: ");
