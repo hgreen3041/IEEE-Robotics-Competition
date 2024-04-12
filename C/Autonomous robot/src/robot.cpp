@@ -33,6 +33,8 @@ const uint8_t xshutPins[sensorCount] = {11,22,17,16};
 
 // Create sensors object
 VL53L1X sensors[sensorCount];
+int sensorAdresses[] = {0x2A, 0x2B, 0x2C, 0x2D};
+
 
 // Create motor driver object 
 motordriver robot;
@@ -136,7 +138,8 @@ void setup(){
     // Each sensor must have its address changed to a unique value other than
     // the default of 0x29 (except for the last one, which could be left at
     // the default). To make it simple, we'll just count up from 0x2A.
-    sensors[i].setAddress(0x2A + i);
+
+    sensors[i].setAddress(sensorAdresses[i]);
     sensors[i].startContinuous(50);
   }
 
@@ -186,67 +189,42 @@ struct Coordinates getCoordinates(){
   sensor4 = sensor4/25.4;
 
 
+// Sets up sensor again on failure AKA: sensor == 0
+//  if(sensor1 == 0.0){
+//     sensors[0].setAddress(sensorAdresses[0]);
+//     sensor1 = static_cast<double>(sensors[0].read(false));
+//     sensor1 = sensor1/25.4;
+//     Serial.println("Sensor1 reset");
+//  }
+
+//   if(sensor2 == 0.0){
+//     sensors[1].setAddress(sensorAdresses[1]);
+//     sensor2 = static_cast<double>(sensors[1].read(false));
+//     sensor2 = sensor2/25.4;
+//     Serial.println("Sensor2 reset");
+//  }
+
+//   if(sensor3 == 0.0){
+//     sensors[2].setAddress(sensorAdresses[2]);
+//     sensor3 = static_cast<double>(sensors[2].read(false));
+//     sensor3 = sensor3/25.4;
+//     Serial.println("Sensor3 reset");
+    
+//  }
+
+//   if(sensor4 == 0.0){
+//     sensors[3].setAddress(sensorAdresses[3]);
+//     sensor4 = static_cast<double>(sensors[3].read(false));
+//     sensor4 = sensor4/25.4;
+//     Serial.println("Sensor4 reset");
+//  }
 
   // Calculate coordinates from sensor data
    x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(96 - halfRobotWidthx - sensor3);
    y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(96 - halfRobotWidthy - sensor2);
 
 
-// Readd this for filter blah blah blah
 
-
-  // if((sensor1+sensor3+2*halfRobotWidthx > 110 ) || (sensor1+sensor3+2*halfRobotWidthx < 80 ) && (sensor2+sensor4+2*halfRobotWidthy < 110)||(sensor2+sensor4+2*halfRobotWidthy < 80))
-  //   {
-  //     Serial.print("sensor 1 + 3 ");
-  //     Serial.println(sensor1+sensor3+(2*halfRobotWidthx));
-  //     Serial.print("sensor 2 + 4 ");
-  //     Serial.println(sensor2+sensor4+(2*halfRobotWidthy));
-  //     Serial.print("Sensor 1: ");
-  //     Serial.println(sensor1);
-  //     Serial.print("Sensor 2: ");
-  //     Serial.println(sensor2);
-  //     Serial.print("Sensor 3: ");
-  //     Serial.println(sensor3);
-  //     Serial.print("Sensor 4 ");
-  //     Serial.println(sensor4);
-
-
-  //     return {prevLocation.x, prevLocation.y};
-  //     Serial.println("We are driving Blind!!!");
-  //   }
-  //   else if((sensor1+sensor3+2*halfRobotWidthx > 110 ) || (sensor1+sensor3+2*halfRobotWidthx < 80 )){
-  //     Serial.print("sensor 1 + 3 ");
-  //     Serial.println(sensor1+sensor3+(2*halfRobotWidthx));
-  //     Serial.print("Sensor 1: ");
-  //     Serial.println(sensor1);
-  //     Serial.print("Sensor 3: ");
-  //     Serial.println(sensor3);
-
-  //     prevLocation.y=y;
-  //     currLocation={prevLocation.x,y};
-  //     return {prevLocation.x, y};
-  //   }
-  //   else if((sensor2+sensor4+2*halfRobotWidthy < 110)||(sensor2+sensor4+2*halfRobotWidthy < 80)){
-  //     Serial.print("sensor 2 + 4 ");
-  //     Serial.println(sensor2+sensor4+(2*halfRobotWidthy));
-  //     Serial.print("Sensor 2: ");
-  //     Serial.println(sensor2);
-  //     Serial.print("Sensor 4 ");
-  //     Serial.println(sensor4);
-
-  //     prevLocation.x=x;
-  //     currLocation={x,prevLocation.y};
-  //     return{x,prevLocation.y};
-
-  //   }
-
-  //   else{
-  //     prevLocation.x = x;
-  //     prevLocation.y = y;
-  //     currLocation = {x,y};
-  //     return {x,y};
-
-  //   }
 
   Serial.println("running");
   Serial.print("sensor1 ");
@@ -262,8 +240,7 @@ struct Coordinates getCoordinates(){
   return {x,y};
 }
 
-// IMPLEMENT
-// get Yaw from IMU
+
 
 String yawString; 
 volatile double yaw = 0;
@@ -274,18 +251,6 @@ double getYaw(){
   yawString = Serial1.readStringUntil('\n');
   yaw = yawString.toFloat();
   
-
-  // // PUT BACK POSSIBLY
-  // if(abs(yaw) > 180){
-  //   yawString = Serial1.readStringUntil('\n');
-  //   yaw = yawString.toFloat();
-  // }
-  // if(abs(yaw) > 180){
-  //   yawString = Serial1.readStringUntil('\n');
-  //   yaw = yawString.toFloat();
-  // }
-
-
   return yaw;
 }
 
@@ -306,28 +271,6 @@ const Coordinates coilH = {0.0 + 4.5, 24.0};
 // Create states (last known coil)
 enum State { stateA, stateD, stateH, stateF, stateB, stateG, stateE, stateC }; 
 
-// Returns the next state given the current state of the robot.
-// State getNextState(State currentState){
-//   switch(currentState){
-//     case stateA:
-//       return stateD;
-//     case stateD: 
-//       return stateH;
-//     case stateH:
-//       return stateF;
-//     case stateF: 
-//       return stateB;
-//     case stateB: 
-//       return stateG;
-//     case stateG:
-//       return stateE;
-//     case stateE:
-//       return stateC;
-//     case stateC:
-//       return stateA;
-//   }
-//   return stateA;
-// }
 
 State currentState = stateB; // initialize the starting location of the robot 
 Coordinates previousCoordinates = coilB; //innitalize with starting location of coil
@@ -352,7 +295,6 @@ void loop1(){
 
 void loop(){
   
-// TODO: Need to implement functions for getting new sensor data if going to use switch statement
 
 // OPTION 1 -----------------------------------------------------------------------------------------------
 
@@ -402,30 +344,8 @@ switch (currentState){
   currLocation = getCoordinates();
   double errorx = destination.x - currLocation.x;
   double errory = destination.y - currLocation.y;
-  // PAUSE CORE?
   double erroryaw = initialYaw - yaw;
 
-//   //  while(abs(errory) >= 3){
-//   //   robot.yMovement(ky*errory);
-//   //   Serial.print("Errory: ");
-//   //   Serial.println(errory);
-//   // }
-
-
-//   // while(abs(errorx) >= 3){
-//   //   robot.xMovement(kx*errorx);
-//   //   Serial.print("Errorx: ");
-//   //   Serial.println(errorx);
-//   // }
-
- 
-
-// // Serial.print("errorx: ");
-// // Serial.println(errorx);
-// // Serial.print("errory: ");
-// // Serial.println(errory);
-// // Serial.print("erroryaw");
-// // Serial.println(erroryaw);
 
 
 // // "P" loop for motor control
@@ -477,10 +397,6 @@ float kyaw = 5.7;
   pwm3 = int((-kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 
   pwm4 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(500)*255); 
 
-  // pwm1 = int(((kx*errorx + ky*errory + kyaw*erroryaw)/500)*255); 
-  // pwm2 = int(((-kx*errorx + ky*errory - kyaw*erroryaw)/500)*255); 
-  // pwm3 = int(((-kx*errorx + ky*errory + kyaw*erroryaw)/500)*255); 
-  // pwm4 = int(((+kx*errorx + ky*errory - kyaw*erroryaw)/500)*255);
 
 
   // Serial.print("PWM1: ");
@@ -537,135 +453,7 @@ float kyaw = 5.7;
 
 
 
-// OPTION 2--------------------------------------------------------------------------
-// dummy loop
 
-// TODO: Change while condition to utilize xMovement and yMovement in driver file
-//        - implement IMU
-
-
-// switch (currentState){
-//   case stateA:
-//     while(coilD.y - getCoordinates().y > 10.0){
-//       // drive forward
-//       Serial.println("Driving Forward");
-//       robot.yMovement(int(ky*(coilD.y - getCoordinates().y)));
-//     }
-
-//     while(coilD.x - getCoordinates().x > 10.0){
-//       // drive right
-//       Serial.println("Driving Right");
-//       robot.xMovement(int(kx*(coilD.x - getCoordinates().x)));
-//     }
-//     // Serial.print("Arrived at ");
-//     // Serial.println(currentState);
-//     currentState = stateD;
-//     break;
-//   case stateB: 
-//     while(coilG.y - getCoordinates().y > 10.0){
-//       // drive forward
-//       Serial.println("Driving forward");
-//       robot.yMovement(int(ky*(coilG.y - getCoordinates().y)));
-//     }
-
-//     while(coilG.x - getCoordinates().x > 10.0){
-//       // drive left
-//       Serial.println("Driving left");
-//       robot.xMovement(int(kx*(coilG.x - getCoordinates().x)));
-//     }
-//     // Serial.print("Arrived at: ");
-//     // Serial.println(currentState);
-//     currentState = stateG;
-//     break;
-//   case stateC: 
-//     while(coilA.x - getCoordinates().x > 10.0){
-//       // drive left
-//       Serial.println("Driving left");
-//       robot.xMovement(int(kx*(coilA.x - getCoordinates().x)));
-//     }
-//     while(coilA.y - getCoordinates().y > 10.0){
-//       // drive backward
-//       Serial.println("Driving Backward");
-//       robot.yMovement(int(ky*(coilA.y - getCoordinates().y)));
-//     }
-//     currentState = stateA;
-//     break;
-
-//   case stateD: 
-//     while(coilH.x - getCoordinates().x > 10.0){
-//       // drive left
-//       Serial.println("Driving left");
-//       robot.xMovement(int(kx*(coilH.x - getCoordinates().x)));
-//     }
-//     while(coilH.y - getCoordinates().y > 10.0){
-//       //drive backward
-//       Serial.println("Driving backward");
-//       robot.yMovement(int(ky*(coilH.x - getCoordinates().x)));
-//     }
-//     currentState = stateH;
-//     break;
-
-//   case stateE: 
-//     while(coilC.x - getCoordinates().x > 10.0){
-//       // drive backward
-//       Serial.println("Driving backward");
-//       robot.xMovement(int(kx*(coilH.x - getCoordinates().x)));
-//     }
-//     while(coilC.y - getCoordinates().y > 10.0){
-//       // drive right
-//       Serial.println("Driving Right");
-//       robot.yMovement(int(ky*(coilH.x - getCoordinates().x)));
-//     }
-//     currentState = stateC;
-//     break;
-
-//   case stateF:
-//     while(coilB.y - getCoordinates().y > 10.0){
-//       // drive backward
-//       Serial.println("Driving backward");
-//       robot.yMovement(int(ky*(coilH.x - getCoordinates().x)));
-
-//     } 
-//     while(coilB.x - getCoordinates().x > 10.0){
-//       // drive right
-//       Serial.println("Driving Right");
-//       robot.xMovement(int(kx*(coilH.x - getCoordinates().x)));
-
-//     }
-//     currentState = stateB;
-//     break;
-
-//   case stateG:
-//     while(coilE.x - getCoordinates().x > 10.0){
-//       // drive right
-//       Serial.println("Driving Right");
-//       robot.xMovement(int(kx*(coilH.x - getCoordinates().x)));
-
-//     }
-//     while(coilE.y - getCoordinates().y > 10.0){
-//       // drive forward
-//       Serial.println("Driving forward");
-//       robot.yMovement(int(ky*(coilH.x - getCoordinates().x)));
-//     }
-//     currentState = stateE;
-//     break;
-
-//   case stateH: 
-//     while(coilF.x - getCoordinates().x > 10.0){
-//       // drive right
-//       Serial.println("Driving right");
-//       robot.xMovement(int(kx*(coilH.x - getCoordinates().x)));
-//     }
-//     while(coilF.y - getCoordinates().y > 10.0){
-//       // drive forward
-//       Serial.println("Driving forward");
-//       robot.yMovement(int(ky*(coilH.x - getCoordinates().x)));
-//     }
-//     break;
-//     currentState = stateF;
-
-
-// }
 
 loopCount += 1;
 
