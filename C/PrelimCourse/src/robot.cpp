@@ -189,38 +189,10 @@ struct Coordinates getCoordinates(){
   sensor4 = sensor4/25.4;
 
 
-// Sets up sensor again on failure AKA: sensor == 0
-//  if(sensor1 == 0.0){
-//     sensors[0].setAddress(sensorAdresses[0]);
-//     sensor1 = static_cast<double>(sensors[0].read(false));
-//     sensor1 = sensor1/25.4;
-//     Serial.println("Sensor1 reset");
-//  }
 
-//   if(sensor2 == 0.0){
-//     sensors[1].setAddress(sensorAdresses[1]);
-//     sensor2 = static_cast<double>(sensors[1].read(false));
-//     sensor2 = sensor2/25.4;
-//     Serial.println("Sensor2 reset");
-//  }
-
-//   if(sensor3 == 0.0){
-//     sensors[2].setAddress(sensorAdresses[2]);
-//     sensor3 = static_cast<double>(sensors[2].read(false));
-//     sensor3 = sensor3/25.4;
-//     Serial.println("Sensor3 reset");
-    
-//  }
-
-//   if(sensor4 == 0.0){
-//     sensors[3].setAddress(sensorAdresses[3]);
-//     sensor4 = static_cast<double>(sensors[3].read(false));
-//     sensor4 = sensor4/25.4;
-//     Serial.println("Sensor4 reset");
-//  }
 
   // Calculate coordinates from sensor data
-   x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(96 - halfRobotWidthx - sensor3);
+   x = (0.5)*(sensor1 + halfRobotWidthx) + (0.5)*(24 - halfRobotWidthx - sensor3);
    y = (0.5)*(sensor4 + halfRobotWidthy) + (0.5)*(96 - halfRobotWidthy - sensor2);
 
 
@@ -236,14 +208,154 @@ struct Coordinates getCoordinates(){
       Serial.print(" sensor4 ");
   Serial.println(sensor4);
 
-
   return {x,y};
 }
 
 
+float kx = 38;
+float ky = 7.3;
+float kyaw = 5.7;
+
+volatile double yaw = 0;
+
+
+int pwm1;
+int pwm2;
+int pwm3;
+int pwm4;
+
+float errorx;
+float errory;
+float erroryaw; 
+
+void navigateToButton1(){
+  currLocation = getCoordinates();
+  errorx = 19.25 - currLocation.x;
+  errory = 78.0 - currLocation.y;
+  erroryaw = 0.0 - yaw;
+
+  while(abs(errory) >= 3.0){
+  currLocation = getCoordinates();
+  errorx = 19.25 - currLocation.x;
+  errory = 78.0 - currLocation.y;
+  erroryaw = 0.0 - yaw;
+  Serial.print("X: ");
+  Serial.println(currLocation.x);
+  Serial.print("Y: ");
+  Serial.println(currLocation.y);
+  Serial.print("Errory: ");
+  Serial.println(errory);
+  Serial.print("Errorx: ");
+  Serial.println(errorx);
+  Serial.println("Navigating to button 1.");
+
+  pwm1 = int((kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 
+  pwm2 = int((-kx*errorx + ky*errory + kyaw*erroryaw)/(500)*255); 
+  pwm3 = int((-kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 
+  pwm4 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(500)*255); 
+  
+  robot.M1(pwm1);
+  robot.M2(pwm2);
+  robot.M3(pwm3);
+  robot.M4(pwm4);
+
+  }
+}
+float xTakeoff = 12;
+
+void pushButton(int button){
+  currLocation = getCoordinates();
+  if(button == 1){
+    xTakeoff = 13.0;
+  }
+
+  if(button == 2){
+    xTakeoff = 11.0;
+  }
+
+  errorx = xTakeoff - currLocation.x;
+  errory = 0.0;
+  erroryaw = 0.0 - yaw;
+
+  while(abs(errorx) >= 1.0 ){
+    currLocation = getCoordinates();
+    errorx = xTakeoff - currLocation.x;
+    erroryaw = 0.0 - yaw;
+    pwm1 = int((kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 
+    pwm2 = int((-kx*errorx + ky*errory + kyaw*erroryaw)/(500)*255); 
+    pwm3 = int((-kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 
+    pwm4 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(500)*255); 
+
+    Serial.print("Errory: ");
+    Serial.println(errory);
+    Serial.print("Errorx: ");
+    Serial.println(errorx);
+
+    Serial.print("Pushing button ");
+    Serial.println(button);
+    
+    robot.M1(pwm1);
+    robot.M2(pwm2);
+    robot.M3(pwm3);
+    robot.M4(pwm4);
+  }
+
+  if(button == 1){
+    robot.stopMotors();
+    robot.moveForward(255);
+    delay(450);
+    robot.stopMotors();
+  }
+
+  else if(button == 2){
+    robot.stopMotors();
+    robot.moveBackward(255);
+    delay(450);
+    robot.stopMotors();
+  }
+
+  else{
+    robot.stopMotors();
+  }
+
+
+
+}
+
+void navigateToButton2(){
+   currLocation = getCoordinates();
+  errorx = 4.75 - currLocation.x;
+  errory = 18.0 - currLocation.y;
+  erroryaw = 0.0 - yaw;
+
+  while(abs(errory) >= 3.0){
+  currLocation = getCoordinates();
+  errorx = 4.75 - currLocation.x;
+  errory = 18.0 - currLocation.y;
+  erroryaw = 0.0 - yaw;
+
+  pwm1 = int((kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 
+  pwm2 = int((-kx*errorx + ky*errory + kyaw*erroryaw)/(500)*255); 
+  pwm3 = int((-kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 
+  pwm4 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(500)*255); 
+
+  Serial.print("Errory: ");
+  Serial.println(errory);
+  Serial.print("Errorx: ");
+  Serial.println(errorx);
+
+  Serial.println("Navigating to button2");
+  
+  robot.M1(pwm1);
+  robot.M2(pwm2);
+  robot.M3(pwm3);
+  robot.M4(pwm4);
+
+  }
+}
+
 
 String yawString; 
-volatile double yaw = 0;
 
 // Get Yaw from UART connection
 double getYaw(){
@@ -259,31 +371,23 @@ double getYaw(){
 // additions/subtractions are for the offset of the robot
 // x-coil distance to center: 4.53
 // y-coil distance to center: 5.9
-const Coordinates coilA = {24.0, 0.0 + 6.0};
-const Coordinates coilB = {72.0, 0.0 + 6.0};
-const Coordinates coilC = {96.0 - 4.5, 24.0};
-const Coordinates coilD = {96.0 - 4.5, 72.0};
-const Coordinates coilE = {72.0, 96.0 - 6.0};
-const Coordinates coilF = {32.0, 96.0 - 6.0};
-const Coordinates coilG = {0.0 + 4.5, 72.0};
-const Coordinates coilH = {0.0 + 4.5, 24.0};
+const Coordinates button1 = {12.0, 94};
+const Coordinates button2 = {12.0, 1};
+
 
 // Create states (last known coil)
-enum State { stateA, stateD, stateH, stateF, stateB, stateG, stateE, stateC }; 
+enum State { start, atButton1, atButton2, finished, button1Pressed }; 
 
 
-State currentState = stateB; // initialize the starting location of the robot 
-Coordinates previousCoordinates = coilB; //innitalize with starting location of coil
+State currentState = start; // initialize the starting location of the robot 
+// Coordinates previousCoordinates = coilB; //innitalize with starting location of coil
 int loopCount = 0;
 float initialYaw = 0.0; // inital yaw on startup
 
 Coordinates destination;
 int ledStatus = 1;
 
-int pwm1;
-int pwm2;
-int pwm3;
-int pwm4;
+
 
 int remoteCount = 0;
 
@@ -295,167 +399,39 @@ void loop1(){
 
 void loop(){
   
-
-// OPTION 1 -----------------------------------------------------------------------------------------------
-
-switch (currentState){
-  case stateA: 
-    destination = coilD;
-    currentState = stateD;
-    Serial.println("Reached coil A");
-    break;
-  case stateB:
-    destination = coilG;
-    currentState = stateG;
-    Serial.println("Reached coil B");
-    break;
-  case stateC:
-    destination = coilA;
-    currentState = stateA;
-    Serial.println("Reached coil C");
-    break;
-  case stateD:
-    destination = coilH;
-    currentState = stateH;
-    Serial.println("Reached coil D");
-    break;
-  case stateE:
-    destination = coilC;
-    currentState = stateC;
-    Serial.println("Reached coil E");
-    break;
-  case stateF:
-    destination = coilB;
-    currentState = stateB;
-    Serial.println("Reached coil F");
-    break;
-  case stateG:
-    destination = coilE;
-    currentState = stateE;
-    Serial.println("Reached coil G");
-    break;
-  case stateH:
-    destination = coilF;
-    currentState = stateF;
-    Serial.println("Reached coil H");
-    break;
-}
-
-  currLocation = getCoordinates();
-  double errorx = destination.x - currLocation.x;
-  double errory = destination.y - currLocation.y;
-  double erroryaw = initialYaw - yaw;
-
-
-
-// // "P" loop for motor control
-// // TODO: Add tolerance (error will never actually be 0)
-
-
-while(abs(errorx) > 4.0 || abs(errory) > 4.0){
-
-  while(remoteCount % 2 == 0){
+  switch (currentState){
+  case start: 
+    robot.moveRight(200);
+    delay(500);
     robot.stopMotors();
-    getCoordinates();
-    Serial.print("Yaw: ");
-    Serial.println(yaw);
-    Serial.println("Waiting for start.");
-    digitalWrite(led, HIGH);
+    navigateToButton1();
+    currentState = atButton1;
+    break;
+  case atButton1:
+   pushButton(1);
+   robot.moveLeft(200);
+   delay(500);
+   robot.stopMotors();
+   currentState = button1Pressed;
+    break;
   
-    
-    if(Serial2.available() > 0){
-      remoteCount += 1;
-      Serial.println(Serial2.readString());
-      Serial.println("Starting movement");
-      
-    }
- }
+  case button1Pressed: 
+    navigateToButton2();
+    currentState = atButton2;
+    break;
 
-  if(Serial2.available() > 0){
-    robot.stopMotors();
-    remoteCount += 1;
-    Serial.println(Serial2.readString());
-    
-  }
+  case atButton2:
+  pushButton(2);
+  currentState = finished;
+  break;
   
-  if(ledStatus == 1){
-    digitalWrite(led,LOW);
-    ledStatus = 0;
-  }
-  else{
-    digitalWrite(led, HIGH);
-    ledStatus = 1;
+  case finished:
+    while(1){}
+    break;
   }
 
-float kx = 9.25;
-float ky = 8.75;
-float kyaw = 5.7;
-
-
-  pwm1 = int((kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 
-  pwm2 = int((-kx*errorx + ky*errory + kyaw*erroryaw)/(500)*255); 
-  pwm3 = int((-kx*errorx + ky*errory - kyaw*erroryaw)/(500)*255); 
-  pwm4 = int((kx*errorx + ky*errory + kyaw*erroryaw)/(500)*255); 
-
-
-
-  // Serial.print("PWM1: ");
-  // Serial.println(pwm1);
-  // Serial.print("PWM2: ");
-  // Serial.println(pwm2);
-  // Serial.print("PWM3: ");
-  // Serial.println(pwm3);
-  // Serial.print("PWM4: ");
-  // Serial.println(pwm4);
 
   
-  robot.M1(pwm1);
-  robot.M2(pwm2);
-  robot.M3(pwm3);
-  robot.M4(pwm4);
-
-
-
-
-  currLocation = getCoordinates();
-  errorx = destination.x - currLocation.x;
-  errory = destination.y - currLocation.y;
-  // PAUSE CORE?
-  erroryaw = initialYaw - yaw;
-
-
-  Serial.print("X-Coordinate: ");
-  Serial.println(currLocation.x);
-  Serial.print("Y-Coordinate: ");
-  Serial.println(currLocation.y);
-  Serial.print("Destination X: ");
-  Serial.println(destination.x);
-  Serial.print("Destination Y: ");
-  Serial.println(destination.y);
-  Serial.print("ErrorX: ");
-  Serial.println(errorx);
-  Serial.print("ErrorY: ");
-  Serial.println(errory);
-  Serial.print("ErrorYaw: ");
-  Serial.println(erroryaw);
-  Serial.print("Yaw: ");
-  Serial.println(yaw);
-  
-
-  
-
-
-}
-
-
-
-
-
-
-
-
-
-loopCount += 1;
 
 
 

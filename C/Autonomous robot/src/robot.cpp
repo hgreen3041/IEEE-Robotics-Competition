@@ -371,12 +371,7 @@ while(abs(errorx) > 4.0 || abs(errory) > 4.0){
     }
  }
 
-  if(Serial2.available() > 0){
-    robot.stopMotors();
-    remoteCount += 1;
-    Serial.println(Serial2.readString());
-    
-  }
+
   
   if(ledStatus == 1){
     digitalWrite(led,LOW);
@@ -442,7 +437,12 @@ float kyaw = 5.7;
   Serial.println(yaw);
   
 
-  
+    if(Serial2.available() > 0){
+    robot.stopMotors();
+    remoteCount += 1;
+    Serial.println(Serial2.readString());
+    
+  }
 
 
 }
