@@ -449,12 +449,6 @@ float kyaw = 5.7;
 
 
 
-
-
-
-
-
-
 loopCount += 1;
 
 
