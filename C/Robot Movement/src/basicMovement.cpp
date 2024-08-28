@@ -260,22 +260,22 @@ void loop(){
     stopMotors();
     delay(1000);
     moveForward(255);
-    delay(1000);
-    moveBackward(255);
-    delay(1000);
-    moveLeft(200);
-    delay(1000);
-    moveRight(255);
-    delay(1000);
-    move45(255);
-    delay(1000);
-    move225(255);
-    delay(1000);
-    move135(255);
-    delay(1000);
-    move315(255);
-    delay(1000);
-    stopMotors();
+    delay(5000);
+    // moveBackward(255);
+    // delay(1000);
+    // moveLeft(200);
+    // delay(1000);
+    // moveRight(255);
+    // delay(1000);
+    // move45(255);
+    // delay(1000);
+    // move225(255);
+    // delay(1000);
+    // move135(255);
+    // delay(1000);
+    // move315(255);
+    // delay(1000);
+    // stopMotors();
     // delay(2000);
 
 }

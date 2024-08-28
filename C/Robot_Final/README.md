@@ -1,0 +1,2 @@
+# Robot application using the BNO08X IMU (before it broke)
+Second round code prior to IMU breaking. This code DOES NOT WORK. DO NOT USE. May be helpful however for reference if you choose to use different IMU. 

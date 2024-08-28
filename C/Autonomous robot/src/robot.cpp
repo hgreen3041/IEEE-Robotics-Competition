@@ -61,6 +61,7 @@ struct Coordinates{
 };
 
 
+// Second setup for thread. This thread only reads the UART port from secondary pico (IMU)
 void setup1(){
    Serial1.setRX(RX1);
   Serial1.setTX(TX1);
@@ -264,7 +265,7 @@ const Coordinates coilB = {72.0, 0.0 + 6.0};
 const Coordinates coilC = {96.0 - 4.5, 24.0};
 const Coordinates coilD = {96.0 - 4.5, 72.0};
 const Coordinates coilE = {72.0, 96.0 - 6.0};
-const Coordinates coilF = {32.0, 96.0 - 6.0};
+const Coordinates coilF = {24.0, 96.0 - 6.0};
 const Coordinates coilG = {0.0 + 4.5, 72.0};
 const Coordinates coilH = {0.0 + 4.5, 24.0};
 
@@ -349,10 +350,7 @@ switch (currentState){
 
 
 // // "P" loop for motor control
-// // TODO: Add tolerance (error will never actually be 0)
-
-
-while(abs(errorx) > 4.0 || abs(errory) > 4.0){
+while(abs(errorx) > 5.0 || abs(errory) > 5.0){
 
   while(remoteCount % 2 == 0){
     robot.stopMotors();
@@ -382,6 +380,7 @@ while(abs(errorx) > 4.0 || abs(errory) > 4.0){
     ledStatus = 1;
   }
 
+// Weights for PID control. In our case we only used P-control
 float kx = 9.25;
 float ky = 8.75;
 float kyaw = 5.7;
@@ -404,6 +403,7 @@ float kyaw = 5.7;
   // Serial.println(pwm4);
 
   
+  // Sends calculated pwm to motors
   robot.M1(pwm1);
   robot.M2(pwm2);
   robot.M3(pwm3);
@@ -415,7 +415,6 @@ float kyaw = 5.7;
   currLocation = getCoordinates();
   errorx = destination.x - currLocation.x;
   errory = destination.y - currLocation.y;
-  // PAUSE CORE?
   erroryaw = initialYaw - yaw;
 
 

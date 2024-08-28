@@ -302,14 +302,14 @@ void pushButton(int button){
 
   if(button == 1){
     robot.stopMotors();
-    robot.moveForward(255);
+    robot.moveForward(212);
     delay(450);
     robot.stopMotors();
   }
 
   else if(button == 2){
     robot.stopMotors();
-    robot.moveBackward(255);
+    robot.moveBackward(212);
     delay(450);
     robot.stopMotors();
   }
