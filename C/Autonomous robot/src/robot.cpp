@@ -289,7 +289,7 @@ int pwm4;
 int remoteCount = 0;
 
 
-
+// Thread for getting yaw via UART
 void loop1(){
   yaw = getYaw();
 }
